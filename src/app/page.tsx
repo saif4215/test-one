@@ -1,69 +1,83 @@
-import Image from "next/image";
+import Link from "next/link";
+import { connection } from "next/server";
+import { NAV } from "@/components/nav";
+import { Card, LinkButton, Notice } from "@/components/ui";
+import { getDb } from "@/lib/db/client";
+import { listAlerts } from "@/lib/repo/operations";
+import { getSettings, listProducts } from "@/lib/repo/products";
 
-export default function Home() {
+export default async function Home() {
+  await connection();
+  const db = getDb();
+  const s = getSettings(db);
+  const productCount = listProducts(db).length;
+  const unread = listAlerts(db, { unreadOnly: true }).length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">AMAZON RESELLING AI</h1>
+        <p className="mt-1 max-w-3xl text-muted">
+          A research assistant that helps you discover, verify, calculate, compare, track, and monitor legitimate Amazon reselling
+          opportunities, and shows the evidence behind every number. The purchasing decision is always yours.
+        </p>
+      </div>
+
+      {!s.onboarded && (
+        <div className="mb-6">
+          <Card title="Amazon Reselling System ready: let's set it up">
+            <p className="text-sm">
+              Answer a few questions (budget, marketplace, FBA/FBM, sourcing methods, profit and ROI targets, categories to sell and
+              avoid, seller account, suppliers) so every analysis uses your numbers.
+            </p>
+            <div className="mt-3">
+              <LinkButton href="/settings">Start setup</LinkButton>
+            </div>
+          </Card>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      )}
+
+      <Card className="mb-6">
+        <form action="/analyze" className="flex flex-col gap-2 sm:flex-row">
+          <label htmlFor="home-q" className="sr-only">ASIN, UPC, URL, or product name</label>
+          <input id="home-q" name="q" className="input flex-1" placeholder="Analyze an ASIN, UPC, URL, or product name" />
+          <button className="btn" type="submit">Analyze</button>
+        </form>
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
+          <span>{productCount} products researched</span>
+          <Link href="/alerts" className={unread ? "font-semibold text-accent" : ""}>{unread} unread alerts</Link>
+          <span>
+            Targets: ${s.targetMinProfit} profit · {s.targetRoiPct}% ROI
+          </span>
         </div>
-      </main>
-    </div>
+      </Card>
+
+      <div className="space-y-6">
+        {NAV.map((g) => (
+          <section key={g.label}>
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">{g.label}</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {g.items.map((i) => (
+                <Link
+                  key={i.href}
+                  href={i.href}
+                  className="rounded-lg border border-border bg-surface p-4 transition-colors hover:border-accent"
+                >
+                  <div className="font-semibold">{i.label}</div>
+                  <div className="mt-1 text-sm text-muted">{i.description}</div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div className="mt-8">
+        <Notice tone="neutral">
+          This app never recommends counterfeit or stolen goods, fake invoices or reviews, review manipulation, or deceptive listings.
+          Fees, restrictions, and policies change: always check them against Amazon&apos;s current rules.
+        </Notice>
+      </div>
+    </>
   );
 }
