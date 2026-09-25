@@ -2,19 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { analyzeProduct, summarize } from "@/lib/analysis/analyzeProduct";
-import { effectiveFeeTable } from "@/lib/analysis/feeTable";
+import { logSnapshot as logProductSnapshot } from "@/lib/analysis/snapshot";
 import { getDb } from "@/lib/db/client";
 import { fNum, fStr, productFromForm } from "@/lib/forms";
 import {
   addPriceObservation,
-  addResearchLog,
   createProduct,
   deletePriceObservation,
   deleteProduct,
   getProduct,
-  getSettings,
-  priceHistoryFor,
   PRODUCT_STATUSES,
   setProductStatus,
   setProductWatch,
@@ -23,38 +19,7 @@ import {
 } from "@/lib/repo/products";
 
 function logSnapshot(productId: number, status: string, notes?: string | null) {
-  const db = getDb();
-  const rec = getProduct(db, productId);
-  if (!rec) return;
-  const settings = getSettings(db);
-  const a = analyzeProduct(rec.data, {
-    settings,
-    feeTable: effectiveFeeTable(settings),
-    priceHistory: priceHistoryFor(db, productId),
-    checkedAt: rec.updatedAt,
-  });
-  const sources = new Set<string>();
-  for (const p of Object.values(rec.data.prov)) if (p.source) sources.add(`${p.source} (${p.kind})`);
-  if (a.fees.referral.kind === "ESTIMATED") sources.add(`Reference fee table ${effectiveFeeTable(settings).effectiveDate} (ESTIMATED)`);
-  addResearchLog(db, {
-    productId,
-    productName: rec.data.name,
-    status,
-    dataSources: [...sources],
-    snapshot: rec.data,
-    summary: {
-      ...summarize(a),
-      purchasePrice: rec.data.purchasePrice,
-      salePrice: rec.data.salePrice,
-      referralFee: a.unit?.referralFee ?? null,
-      fulfillmentFee: a.unit?.fulfillmentFee ?? null,
-      sellerCount: rec.data.sellerCount,
-      salesRank: rec.data.salesRank,
-      assumptions: a.assumptions,
-      confidenceReason: a.confidence.reason,
-    },
-    notes: notes ?? null,
-  });
+  logProductSnapshot(getDb(), productId, status, notes);
 }
 
 export async function saveProductAction(formData: FormData) {
