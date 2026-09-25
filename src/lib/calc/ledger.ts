@@ -125,8 +125,8 @@ export function monthlyCashFlow(transactions: Transaction[], openingCash = 0): C
 
 export interface POLine {
   product: string;
-  sku?: string;
-  asin?: string;
+  sku?: string | null;
+  asin?: string | null;
   quantity: number;
   unitCost: number;
   /** Expected selling price per unit, used for expected revenue. */
