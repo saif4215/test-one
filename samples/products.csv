@@ -1,0 +1,6 @@
+Title,Brand,ASIN,Category,Supplier,Buy Cost,Amazon Price,Qty,Weight,Length,Width,Height,Sellers,BSR,Monthly Sales,My Notes
+SAMPLE Silicone Spatula Set (example row),ExampleBrand,B0SAMPLE01,Home & Kitchen,Example Wholesale Co,8.00,24.99,10,0.6,12,4,2,4,15000,90,Made-up sample data for testing the scanner
+SAMPLE Puzzle 500pc (example row),ExampleToys,B0SAMPLE02,Toys & Games,Example Clearance Store,6.50,19.99,6,1.1,11,8,2,9,42000,40,Made-up sample data
+SAMPLE Face Serum 1oz (example row),ExampleBeauty,B0SAMPLE03,"Beauty, Health & Personal Care",Example Distributor,4.00,12.99,24,0.3,5,2,2,14,8000,300,Made-up sample data - check expiration and gating
+SAMPLE Phone Stand (example row),ExampleTech,B0SAMPLE04,Electronics Accessories,Example Online Retailer,11.00,15.99,12,0.5,7,4,3,6,60000,25,Made-up sample data - thin margin
+SAMPLE Mystery Item (example row),,,,,5.00,,,,,,,,,,Made-up sample row with missing data

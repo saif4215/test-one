@@ -159,6 +159,18 @@ export const alerts = sqliteTable("alerts", {
   read: integer("read", { mode: "boolean" }).notNull().default(false),
 });
 
+/** Uploaded spreadsheets. The original rows are kept unchanged so exports never lose data (§34). */
+export const imports = sqliteTable("imports", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  batch: text("batch").notNull(),
+  filename: text("filename").notNull(),
+  createdAt: text("created_at").notNull(),
+  headers: text("headers", { mode: "json" }).notNull(),
+  rows: text("rows", { mode: "json" }).notNull(),
+  mapping: text("mapping", { mode: "json" }).notNull(),
+  options: text("options", { mode: "json" }).notNull(),
+});
+
 export const checklists = sqliteTable("checklists", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   period: text("period").notNull(),

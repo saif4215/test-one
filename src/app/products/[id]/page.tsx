@@ -38,6 +38,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[id]"
         actions={
           <>
             <LinkButton href={`/products/${id}/edit`}>Edit data</LinkButton>
+            <LinkButton href={`/match?product=${id}`} variant="secondary">Check match</LinkButton>
             <LinkButton href={`/products/${id}/report`} variant="secondary">Deal report</LinkButton>
             <a className="btn btn-secondary" href={`/products/${id}/report.md`}>Download .md</a>
             <form action={toggleWatchAction.bind(null, id, !rec.watch)}>

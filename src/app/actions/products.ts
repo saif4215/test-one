@@ -136,3 +136,15 @@ export async function logResearchAction(id: number, formData: FormData) {
   revalidatePath(`/products/${id}`);
   revalidatePath("/research-log");
 }
+
+export async function saveMatchVerdictAction(id: number, formData: FormData) {
+  const verdict = fStr(formData, "verdict");
+  if (verdict !== "MATCH" && verdict !== "POSSIBLE MATCH" && verdict !== "DO NOT MATCH") return;
+  const db = getDb();
+  const rec = getProduct(db, id);
+  if (!rec) return;
+  updateProduct(db, id, { ...rec.data, identityVerdict: verdict });
+  logSnapshot(id, "identity checked", `Product matching verdict: ${verdict}`);
+  revalidatePath(`/products/${id}`);
+  redirect(`/products/${id}`);
+}

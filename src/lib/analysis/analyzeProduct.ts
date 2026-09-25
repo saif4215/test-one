@@ -98,6 +98,8 @@ export interface DealAnalysis {
   testBuyNote: string | null;
   scaling: ScalingPlan | null;
   filter: FilterOutcome;
+  /** The values the deal filters are checked against (for re-filtering with other criteria). */
+  filterSubject: FilterSubject;
   dataPoints: DataPoint[];
   assumptions: string[];
   missing: string[];
@@ -591,6 +593,7 @@ export function analyzeProduct(p: ProductInput, ctx: AnalysisContext): DealAnaly
     testBuyNote,
     scaling,
     filter,
+    filterSubject: subject,
     dataPoints,
     assumptions,
     missing,

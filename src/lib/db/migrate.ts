@@ -106,6 +106,18 @@ export const MIGRATIONS: string[] = [
     UNIQUE(period, period_key)
   );
   `,
+  `
+  CREATE TABLE imports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    batch TEXT NOT NULL UNIQUE,
+    filename TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    headers TEXT NOT NULL,
+    rows TEXT NOT NULL,
+    mapping TEXT NOT NULL,
+    options TEXT NOT NULL
+  );
+  `,
 ];
 
 export function migrate(sqlite: Database.Database): void {
