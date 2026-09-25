@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { FEE_CATEGORIES, US_FEE_TABLE } from "@/data/feeTables.us";
 import { saveSettingsAction } from "@/app/actions/settings";
+import { GoogleSheetsSync } from "@/components/GoogleSheetsSync";
 import { Card, Field, Notice, NumberInput, PageHeader, Pill, TextInput } from "@/components/ui";
 import { getDb } from "@/lib/db/client";
 import { providerStatuses } from "@/lib/providers";
@@ -235,6 +236,13 @@ export default async function SettingsPage({ searchParams }: PageProps<"/setting
               </li>
             ))}
           </ul>
+          <div className="mt-5 border-t border-border pt-4">
+            <GoogleSheetsSync
+              back="/settings"
+              result={typeof sp.sheets === "string" ? sp.sheets : undefined}
+              error={typeof sp.sheetsError === "string" ? sp.sheetsError : undefined}
+            />
+          </div>
           <p className="mt-4 text-xs text-muted">
             The app never scrapes websites or gets around logins, CAPTCHAs, rate limits, or paywalls. Paid tools (Keepa, etc.) are not
             built in, but you can type their numbers in or import their exports as CSV, labeled Third-party.

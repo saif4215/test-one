@@ -14,12 +14,23 @@ export interface ProviderStatus {
   cost: string;
 }
 
+/** A possible retailer listing (e.g. from a search API). It's never auto-filled into the product. */
+export interface PriceCandidate {
+  title: string;
+  url: string;
+  source: string;
+  price: number | null;
+  currency: string | null;
+  checkedAt: string;
+}
+
 export interface LookupResult {
   providerId: string;
   providerName: string;
   /** Fields found. Each also gets an entry in `fields.prov` with its kind, source, and timestamp. */
   fields: Partial<ProductInput>;
   priceObservations?: PriceObservation[];
+  candidates?: PriceCandidate[];
   messages: string[];
 }
 

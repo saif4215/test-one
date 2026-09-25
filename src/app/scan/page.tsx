@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { importGoogleSheetAction } from "@/app/actions/google";
 import { uploadSpreadsheetAction } from "@/app/actions/scan";
 import { ImportOptionsFields } from "@/components/ImportOptionsFields";
 import { Card, Field, Notice, PageHeader, TableWrap } from "@/components/ui";
 import { getDb } from "@/lib/db/client";
 import { fmtDateTime } from "@/lib/format";
 import { MAX_ROWS } from "@/lib/import/spreadsheet";
+import { readServiceAccount } from "@/lib/google/auth";
 import { listImports } from "@/lib/repo/imports";
 
 export default async function ScanPage({ searchParams }: PageProps<"/scan">) {
@@ -41,6 +43,33 @@ export default async function ScanPage({ searchParams }: PageProps<"/scan">) {
           <button className="btn" type="submit">Scan</button>
         </div>
       </form>
+
+      <div className="mt-6">
+        <Card title="Or import from a Google Sheet">
+          {readServiceAccount() ? (
+            <form action={importGoogleSheetAction} className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
+              <Field label="Google Sheets URL or ID" name="sheet">
+                <input id="sheet" name="sheet" className="input" placeholder="https://docs.google.com/spreadsheets/d/…" required />
+              </Field>
+              <Field label="Tab name (optional)" name="tab">
+                <input id="tab" name="tab" className="input" placeholder="First tab" />
+              </Field>
+              <Field label="Sales data from" name="gs-kind">
+                <select id="gs-kind" name="marketDataKind" className="input" defaultValue="USER_PROVIDED">
+                  <option value="USER_PROVIDED">I checked it myself</option>
+                  <option value="THIRD_PARTY">A third-party tool</option>
+                </select>
+              </Field>
+              <button className="btn btn-secondary" type="submit">Import sheet</button>
+            </form>
+          ) : (
+            <p className="text-sm text-muted">
+              Set up Google Sheets access (GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_PRIVATE_KEY; see the README) to import a sheet directly. Until then, use
+              File → Download → CSV in Google Sheets and upload the file above.
+            </p>
+          )}
+        </Card>
+      </div>
 
       <div className="mt-6">
         <Card title="Recent scans">

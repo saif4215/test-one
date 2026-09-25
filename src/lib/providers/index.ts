@@ -4,16 +4,29 @@ import type { PriceObservation } from "@/lib/calc/priceHistory";
 import { LIVE_DATA_UNAVAILABLE } from "@/lib/data/provenance";
 import { parseQuery, type ParsedQuery } from "./identifiers";
 import { localProvider } from "./local";
+import { sheetsConfig } from "@/lib/google/sync";
+import { googleSearchProvider } from "./googleSearch";
 import { spApiProvider } from "./spapi";
-import type { DataProvider, ProviderStatus } from "./types";
+import type { DataProvider, PriceCandidate, ProviderStatus } from "./types";
 
 export function providers(db: DB): DataProvider[] {
-  return [localProvider(db), spApiProvider()];
+  return [localProvider(db), spApiProvider(), googleSearchProvider()];
 }
 
 export function providerStatuses(db: DB): ProviderStatus[] {
   const list = providers(db).map((p) => p.status());
+  const sheets = sheetsConfig();
   list.push(
+    {
+      id: "google-sheets",
+      name: "Google Sheets sync",
+      configured: sheets.configured,
+      capabilities: ["Export products, inventory, POs, cash flow, and suppliers to your Sheet", "Import buy lists from a Sheet"],
+      description: "Uses the free Google Sheets API with your own Google Cloud service account. Only sheets you share with it are accessible.",
+      setup:
+        "Create a service account in Google Cloud, enable the Sheets API, set GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, and GOOGLE_SHEET_ID, and share the Sheet with the service account email.",
+      cost: "Free (Google Sheets API quotas apply)",
+    },
     {
       id: "manual",
       name: "Manual entry",
@@ -41,6 +54,7 @@ export interface GatherResult {
   sourcesUsed: string[];
   messages: string[];
   liveDataUsed: boolean;
+  candidates: PriceCandidate[];
 }
 
 /**
@@ -59,6 +73,7 @@ export async function gatherProduct(
   const sourcesUsed: string[] = [];
   let priceHistory: PriceObservation[] = [];
   let liveDataUsed = false;
+  const candidates: PriceCandidate[] = [];
 
   if (query.type === "asin") product.asin = query.asin;
   if (query.type === "upc") {
@@ -88,13 +103,15 @@ export async function gatherProduct(
       const clean = Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== null && v !== undefined && v !== ""));
       product = productInputSchema.parse({ ...product, ...clean, prov: { ...product.prov, ...(prov ?? {}) } });
       if (r.priceObservations?.length) priceHistory = r.priceObservations;
+      if (r.candidates?.length) candidates.push(...r.candidates);
       messages.push(...r.messages);
       sourcesUsed.push(r.providerName);
-      if (p.status().id !== "local") liveDataUsed = true;
+      // Search candidates aren't product data, so they don't count as live data for the analysis.
+      if (p.status().id !== "local" && Object.keys(clean).length > 0) liveDataUsed = true;
     } catch (e) {
       messages.push(`${st.name}: ${(e as Error).message}`);
     }
   }
   if (!liveDataUsed) messages.push(LIVE_DATA_UNAVAILABLE);
-  return { query, product, priceHistory, sourcesUsed, messages, liveDataUsed };
+  return { query, product, priceHistory, sourcesUsed, messages, liveDataUsed, candidates };
 }

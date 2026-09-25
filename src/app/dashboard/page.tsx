@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import { GoogleSheetsSync } from "@/components/GoogleSheetsSync";
 import { MonthlyChart } from "@/components/MonthlyChart";
 import { Card, Notice, PageHeader, Stat, TableWrap } from "@/components/ui";
 import { daysOfInventory, findSlowMovers, inventoryTurnover } from "@/lib/calc/inventory";
@@ -9,8 +10,9 @@ import { fmtNum, fmtPct, fmtUSD } from "@/lib/format";
 import { listInventory, listSales, listTransactions } from "@/lib/repo/operations";
 import { getSettings } from "@/lib/repo/products";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   await connection();
+  const sp = await searchParams;
   const db = getDb();
   const settings = getSettings(db);
   const items = listInventory(db);
@@ -109,6 +111,15 @@ export default async function DashboardPage() {
               </table>
             </TableWrap>
           )}
+        </Card>
+      </div>
+      <div className="mt-5">
+        <Card title="Google Sheets">
+          <GoogleSheetsSync
+            back="/dashboard"
+            result={typeof sp.sheets === "string" ? sp.sheets : undefined}
+            error={typeof sp.sheetsError === "string" ? sp.sheetsError : undefined}
+          />
         </Card>
       </div>
       <p className="mt-4 text-xs text-muted">

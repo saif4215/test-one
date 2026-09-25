@@ -1,8 +1,9 @@
 import { connection } from "next/server";
 import { ProductForm } from "@/components/ProductForm";
-import { Card, Notice, PageHeader } from "@/components/ui";
+import { Card, KindBadge, Notice, PageHeader, TableWrap } from "@/components/ui";
 import { getDb } from "@/lib/db/client";
 import { EMPTY_PRODUCT } from "@/lib/domain/product";
+import { fmtDateTime, fmtUSD } from "@/lib/format";
 import { gatherProduct } from "@/lib/providers";
 
 export default async function AnalyzePage({ searchParams }: PageProps<"/analyze">) {
@@ -44,6 +45,47 @@ export default async function AnalyzePage({ searchParams }: PageProps<"/analyze"
               {m}
             </Notice>
           ))}
+        </div>
+      )}
+
+      {gathered && gathered.candidates.length > 0 && (
+        <div className="mt-4">
+          <Card title="Possible retailer listings (not filled in automatically)">
+            <TableWrap>
+              <table className="data">
+                <thead>
+                  <tr>
+                    <th>Listing</th>
+                    <th>Source</th>
+                    <th className="r">Listed price</th>
+                    <th>Type</th>
+                    <th>Checked</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {gathered.candidates.map((c) => (
+                    <tr key={c.url}>
+                      <td className="max-w-md">
+                        <a className="text-accent underline" href={c.url} target="_blank" rel="noopener noreferrer nofollow">
+                          {c.title}
+                        </a>
+                      </td>
+                      <td>{c.source}</td>
+                      <td className="r">{c.price === null ? "Not listed" : `${fmtUSD(c.price)}${c.currency && c.currency !== "USD" ? ` ${c.currency}` : ""}`}</td>
+                      <td>
+                        <KindBadge kind="THIRD_PARTY" />
+                      </td>
+                      <td className="whitespace-nowrap text-xs text-muted">{fmtDateTime(c.checkedAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </TableWrap>
+            <p className="mt-2 text-xs text-muted">
+              Open the listing and confirm it&apos;s the exact product (brand, size, pack count, condition) at the current price, then enter the purchase price and
+              source below.
+            </p>
+          </Card>
         </div>
       )}
 
