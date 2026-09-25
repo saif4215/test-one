@@ -29,7 +29,7 @@ export function Card({
   id?: string;
 }) {
   return (
-    <section id={id} className={`rounded-lg border border-border bg-surface ${className}`}>
+    <section id={id} className={`min-w-0 rounded-lg border border-border bg-surface ${className}`}>
       {(title || actions) && (
         <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
           {title && <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{title}</h2>}
