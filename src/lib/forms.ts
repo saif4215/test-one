@@ -112,6 +112,8 @@ export function productFromForm(fd: FormData, now = new Date()): ProductInput {
     identityVerdict: fStr(fd, "identityVerdict"),
     restrictionChecked: fBool(fd, "restrictionChecked"),
     notes: fStr(fd, "notes") ?? "",
+    // The listing worksheet is edited on its own page; keep it as-is here.
+    listing: original.listing,
   };
   for (const k of STRING_FIELDS) next[k] = fStr(fd, k);
   for (const k of NUMERIC_FIELDS) next[k] = fNum(fd, k);

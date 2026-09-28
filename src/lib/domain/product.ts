@@ -15,6 +15,24 @@ export const provEntrySchema = z.object({
 });
 export type ProvEntry = z.infer<typeof provEntrySchema>;
 
+/** Listing research worksheet (§21). Everything here is what you recorded from the listing. */
+export const listingSchema = z.object({
+  title: z.string().default(""),
+  bullets: z.array(z.string()).default([]),
+  description: z.string().default(""),
+  variations: z.string().default(""),
+  size: z.string().default(""),
+  color: z.string().default(""),
+  packCount: z.number().nullable().default(null),
+  imageCount: z.number().nullable().default(null),
+  searchTerms: z.string().default(""),
+  customerQuestions: z.string().default(""),
+  complaints: z.string().default(""),
+  reviewThemes: z.string().default(""),
+  checkedAt: z.string().nullable().default(null),
+});
+export type ListingResearch = z.infer<typeof listingSchema>;
+
 export const productInputSchema = z.object({
   name: z.string().default(""),
   brand: str,
@@ -70,6 +88,7 @@ export const productInputSchema = z.object({
   identityVerdict: z.enum(["MATCH", "POSSIBLE MATCH", "DO NOT MATCH"]).nullable().default(null),
   restrictionChecked: z.boolean().default(false),
   notes: z.string().default(""),
+  listing: listingSchema.nullable().default(null),
   /** Where each field's value came from, keyed by field name. */
   prov: z.record(z.string(), provEntrySchema).default({}),
 });

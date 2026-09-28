@@ -7,6 +7,7 @@ import { applyFilters, type DealFilters } from "@/lib/calc/filters";
 import { getDb } from "@/lib/db/client";
 import { fmtPct, fmtUSD } from "@/lib/format";
 import { getSettings } from "@/lib/repo/products";
+import { BeginnerHelp } from "@/components/BeginnerHelp";
 
 type SP = Record<string, string | string[] | undefined>;
 const num = (sp: SP, k: string): number | null => {
@@ -88,6 +89,10 @@ export default async function DealsPage({ searchParams }: PageProps<"/deals">) {
         subtitle="Runs every saved and imported product through your criteria (the research pipeline) and explains why each one passed or failed. Results are not ranked."
         actions={<LinkButton href="/scan" variant="secondary">Import more products</LinkButton>}
       />
+      <BeginnerHelp>
+        Each product is checked against your rules. <strong>Pass</strong> means every rule is met with the data you have. <strong>Needs data</strong>{" "}
+        means something is unknown (often whether you&apos;re allowed to sell it). <strong>Fail</strong> shows exactly which rule it missed.
+      </BeginnerHelp>
       <Card>
         <form action="/deals" className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <Field label="Min profit $" name="minProfit"><NumberInput name="minProfit" defaultValue={filters.minProfit} /></Field>

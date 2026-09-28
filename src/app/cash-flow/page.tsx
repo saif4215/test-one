@@ -7,6 +7,7 @@ import { fmtUSD } from "@/lib/format";
 import { listTransactions } from "@/lib/repo/operations";
 import { getSettings } from "@/lib/repo/products";
 import { TAX_DISCLAIMER } from "@/lib/reports/tax";
+import { BeginnerHelp } from "@/components/BeginnerHelp";
 
 const GROUP_LABEL = { inflow: "Income", cogs: "COGS (inventory)", operating: "Operating expense", equity: "Owner / capital" } as const;
 
@@ -42,6 +43,10 @@ export default async function CashFlowPage({ searchParams }: PageProps<"/cash-fl
           <Notice tone="bad">{sp.error}</Notice>
         </div>
       )}
+      <BeginnerHelp>
+        Record every payout from Amazon and every business expense here. Choose the type that matches. Inventory purchases count as <em>COGS</em>{" "}
+        (cost of goods), and things like software and supplies are <em>operating expenses</em>. Both go into the tax-prep summary.
+      </BeginnerHelp>
       <Notice tone="info" title="Cash isn't profit.">
         Buying inventory lowers your cash now, but it only counts as a cost (COGS) when the item sells. Amazon also pays out on a delay after
         the sale. So a profitable month can still leave you with less cash, and the other way around.

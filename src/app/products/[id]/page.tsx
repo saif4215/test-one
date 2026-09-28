@@ -15,6 +15,7 @@ import { loadAnalysis } from "@/lib/analysis/load";
 import { getDb } from "@/lib/db/client";
 import { fmtDateTime, fmtNum, fmtUSD } from "@/lib/format";
 import { getSettings, listPriceObservations, listResearchLog, PRODUCT_STATUSES } from "@/lib/repo/products";
+import { BeginnerHelp } from "@/components/BeginnerHelp";
 
 export default async function ProductPage({ params }: PageProps<"/products/[id]">) {
   await connection();
@@ -48,6 +49,11 @@ export default async function ProductPage({ params }: PageProps<"/products/[id]"
         }
       />
 
+      <BeginnerHelp>
+        <strong>Profit</strong> is what&apos;s left after every cost. <strong>ROI</strong> compares that profit to the money you pay upfront.{" "}
+        <strong>Break-even</strong> is the lowest price at which you don&apos;t lose money. Values tagged <em>Estimate</em> or <em>Assumption</em> haven&apos;t
+        been confirmed, so check them before you buy. <em>Unknown</em> means the data is missing, not zero.
+      </BeginnerHelp>
       <Card className="no-print mb-5">
         <form action={setStatusAction.bind(null, id)} className="grid gap-3 sm:grid-cols-[200px_1fr_auto] sm:items-end">
           <Field label="Research status" name="status">

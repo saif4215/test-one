@@ -9,6 +9,7 @@ import { fmtDateTime } from "@/lib/format";
 import { MAX_ROWS } from "@/lib/import/spreadsheet";
 import { readServiceAccount } from "@/lib/google/auth";
 import { listImports } from "@/lib/repo/imports";
+import { BeginnerHelp } from "@/components/BeginnerHelp";
 
 export default async function ScanPage({ searchParams }: PageProps<"/scan">) {
   await connection();
@@ -25,6 +26,10 @@ export default async function ScanPage({ searchParams }: PageProps<"/scan">) {
           <Notice tone="bad">{sp.error}</Notice>
         </div>
       )}
+      <BeginnerHelp>
+        Upload a list of products (a buy list, supplier catalog, or export from another tool). The app matches your columns (cost, price, ASIN, and so on),
+        analyzes every row, and lets you download the same file with profit, ROI, and risk columns added. Your original columns are never changed.
+      </BeginnerHelp>
       <form action={uploadSpreadsheetAction} className="space-y-5">
         <Card title="1. Choose data">
           <div className="grid gap-4 lg:grid-cols-2">

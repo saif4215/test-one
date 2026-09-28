@@ -9,6 +9,7 @@ import { getDb } from "@/lib/db/client";
 import { fmtNum, fmtPct, fmtUSD } from "@/lib/format";
 import { listInventory, listSales, listTransactions } from "@/lib/repo/operations";
 import { getSettings } from "@/lib/repo/products";
+import { BeginnerHelp } from "@/components/BeginnerHelp";
 
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   await connection();
@@ -45,6 +46,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         title="Dashboard"
         subtitle="Profit comes from recorded sales (revenue − refunds − Amazon fees − cost of goods sold − operating expenses). Cash comes from recorded transactions. The two aren't the same."
       />
+      <BeginnerHelp>
+        <strong>Revenue</strong> is what customers paid. <strong>COGS</strong> is what the units you sold cost you. <strong>Net profit</strong>{" "}
+        subtracts fees and expenses too. <strong>Cash available</strong> is different: money you spent on unsold inventory isn&apos;t lost, but it isn&apos;t cash either.
+      </BeginnerHelp>
       {empty && (
         <div className="mb-5">
           <Notice tone="info">

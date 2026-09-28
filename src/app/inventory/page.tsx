@@ -13,6 +13,7 @@ import { getDb } from "@/lib/db/client";
 import { fmtNum, fmtUSD } from "@/lib/format";
 import { listInventory, listSales, listSuppliers } from "@/lib/repo/operations";
 import { getSettings } from "@/lib/repo/products";
+import { BeginnerHelp } from "@/components/BeginnerHelp";
 
 export default async function InventoryPage({ searchParams }: PageProps<"/inventory">) {
   await connection();
@@ -37,6 +38,10 @@ export default async function InventoryPage({ searchParams }: PageProps<"/invent
           <Notice tone="bad">{sp.error}</Notice>
         </div>
       )}
+      <BeginnerHelp>
+        <strong>Landed cost</strong> is what one unit really cost you (price + shipping + prep). <strong>On hand</strong> is what you still have, including units
+        at Amazon. Record each sale so the app can tell you what&apos;s selling and when to reorder.
+      </BeginnerHelp>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="Units in inventory" value={fmtNum(sum.unitsOnHand)} />
         <Stat label="Inventory value (cost)" value={fmtUSD(sum.costValue)} hint="On-hand units × landed cost" />

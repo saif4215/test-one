@@ -23,6 +23,15 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
+    label: "Listing Tools",
+    items: [
+      { href: "/listing-research", label: "Listing Research", description: "Record a listing's title, bullets, variations, questions, and complaints." },
+      { href: "/listing-writer", label: "Listing Writer", description: "Generate an original title, bullets, description, and search terms without unsupported claims." },
+      { href: "/keywords", label: "Keyword Research", description: "Find shared, high-intent phrases from titles and search terms you paste in." },
+      { href: "/reviews", label: "Review Analysis", description: "Find common complaints and compliments in reviews you paste in." },
+    ],
+  },
+  {
     label: "Operations",
     items: [
       { href: "/inventory", label: "Track Inventory", description: "SKUs, quantities, landed cost, sales, and slow movers." },
@@ -44,6 +53,7 @@ export const NAV: NavGroup[] = [
   {
     label: "Business",
     items: [
+      { href: "/capital", label: "Capital Planner", description: "Split your budget between inventory, shipping, operating costs, and a reserve." },
       { href: "/workflows", label: "Workflows", description: "Daily, weekly, and monthly checklists." },
       { href: "/business-plan", label: "Business Plan", description: "Build a business plan from your settings and records." },
       { href: "/glossary", label: "Glossary", description: "Plain-language definitions of reselling terms." },
