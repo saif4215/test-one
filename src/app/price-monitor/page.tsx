@@ -60,7 +60,15 @@ export default async function PriceMonitorPage({ searchParams }: PageProps<"/pri
                     <tr key={rec.id}>
                       <td className="min-w-40">
                         <Link className="font-medium text-accent hover:underline" href={`/products/${rec.id}`}>{rec.data.name || "(unnamed)"}</Link>
-                        <div className="text-xs text-muted">{h.observations} observations</div>
+                        <div className="text-xs text-muted">
+                          {h.observations} observations
+                          {h.observations >= 2 && (
+                            <>
+                              {" · "}
+                              <Link className="text-accent hover:underline" href={`/products/${rec.id}#price-history`}>Chart</Link>
+                            </>
+                          )}
+                        </div>
                       </td>
                       <td className="r">{fmtUSD(h.current ?? rec.data.salePrice)}</td>
                       <td className="r">{fmtUSD(h.avg30)}</td>

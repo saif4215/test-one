@@ -10,6 +10,7 @@ import {
   toggleWatchAction,
 } from "@/app/actions/products";
 import { DealReport } from "@/components/DealReport";
+import { PriceChart } from "@/components/PriceChart";
 import { Card, Field, LinkButton, NumberInput, PageHeader, TableWrap, TextInput } from "@/components/ui";
 import { loadAnalysis } from "@/lib/analysis/load";
 import { getDb } from "@/lib/db/client";
@@ -76,6 +77,12 @@ export default async function ProductPage({ params }: PageProps<"/products/[id]"
       </Card>
 
       <DealReport a={analysis} advanced={settings.mode === "advanced"} />
+
+      <div className="mt-5" id="price-history">
+        <Card title="Amazon selling price history">
+          <PriceChart points={amazonObs.map((o) => ({ at: o.at, price: o.price, sellerCount: o.sellerCount }))} avg90={analysis.priceHistory.avg90} />
+        </Card>
+      </div>
 
       <div className="no-print mt-6 grid gap-5 lg:grid-cols-2">
         <Card title="Record a price observation">

@@ -16,6 +16,8 @@ const TYPE_LABEL: Record<string, string> = {
   seller_count_change: "Seller count change",
   price_above_average: "Price above average",
   stale_data: "Stale data",
+  low_inventory: "Low inventory",
+  supplier_price_change: "Supplier price change",
   reorder_point: "Reorder point",
 };
 

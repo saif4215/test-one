@@ -95,7 +95,22 @@ export function runDealFinder(db: DB, now: Date = new Date()): DealFinderResult 
     const rop = reorderPoint(daily, lead, safetyStock(daily, settings.costDefaults.safetyDays));
     const left = onHand(item);
     const key = `inventory-${item.id}`;
-    if (left <= rop && !hasUnread("reorder_point", null, key)) {
+    const ss = safetyStock(daily, settings.costDefaults.safetyDays);
+    if (left <= ss) {
+      // More urgent than the reorder point, so it replaces that alert.
+      if (!hasUnread("low_inventory", null, key)) {
+        addAlert(db, {
+          type: "low_inventory",
+          productId: null,
+          title: `${item.name}: ${left === 0 ? "out of stock" : "low inventory"}`,
+          message: `${left} on hand, which covers about ${daily > 0 ? Math.floor(left / daily) : 0} day(s) of sales at ${daily.toFixed(2)}/day (last 30 days). Safety stock is ${ss}. Actual demand can differ.`,
+          dataSource: "Your recorded sales",
+          dataTimestamp: ranAt,
+          data: { key, inventoryId: item.id },
+        });
+        alertsCreated++;
+      }
+    } else if (left <= rop && !hasUnread("reorder_point", null, key)) {
       addAlert(db, {
         type: "reorder_point",
         productId: null,
@@ -104,6 +119,25 @@ export function runDealFinder(db: DB, now: Date = new Date()): DealFinderResult 
         dataSource: "Your recorded sales",
         dataTimestamp: ranAt,
         data: { key, inventoryId: item.id },
+      });
+      alertsCreated++;
+    }
+  }
+
+  // Supplier price changes (§65): the current price you recorded differs from the last price.
+  for (const s of suppliers.values()) {
+    if (s.lastPrice === null || s.currentPrice === null || s.lastPrice <= 0) continue;
+    const change = (s.currentPrice - s.lastPrice) / s.lastPrice;
+    const key = `supplier-${s.id}-${s.currentPrice}`;
+    if (Math.abs(change) >= 0.05 && !hasUnread("supplier_price_change", null, key)) {
+      addAlert(db, {
+        type: "supplier_price_change",
+        productId: null,
+        title: `${s.name}: price ${change > 0 ? "up" : "down"} ${(Math.abs(change) * 100).toFixed(1)}%`,
+        message: `From ${fmtUSD(s.lastPrice)} to ${fmtUSD(s.currentPrice)} (as recorded on the supplier page). Re-check the maximum buy price for products from this supplier.`,
+        dataSource: "Your supplier records",
+        dataTimestamp: ranAt,
+        data: { key, supplierId: s.id },
       });
       alertsCreated++;
     }

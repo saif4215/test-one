@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { openDatabase } from "@/lib/db/client";
 import { productInputSchema } from "@/lib/domain/product";
 import { DEFAULT_SETTINGS } from "@/lib/domain/settings";
-import { createInventoryItem, listAlerts, recordSale } from "@/lib/repo/operations";
+import { createInventoryItem, createSupplier, listAlerts, recordSale } from "@/lib/repo/operations";
 import { createProduct, getProduct, saveSettings, updateProduct } from "@/lib/repo/products";
 import { runDealFinder } from "./dealFinder";
 
@@ -48,10 +48,32 @@ describe("runDealFinder", () => {
   it("raises a reorder alert from recent sales", () => {
     const db = openDatabase(":memory:");
     const inv = createInventoryItem(db, { sku: "S", name: "Fast seller", unitCost: 5, qtyPurchased: 30, qtyReceived: 30 });
-    recordSale(db, { inventoryId: inv, date: "2026-09-20", qty: 27, salePrice: 20, fees: 0 });
+    // 20 sold in 30 days → 0.67/day; safety stock 5, reorder point 15; 10 left → reorder
+    recordSale(db, { inventoryId: inv, date: "2026-09-20", qty: 20, salePrice: 20, fees: 0 });
     const r = runDealFinder(db, new Date("2026-09-24T12:00:00Z"));
     expect(r.alertsCreated).toBe(1);
     expect(listAlerts(db)[0].type).toBe("reorder_point");
     expect(runDealFinder(db, new Date("2026-09-24T13:00:00Z")).alertsCreated).toBe(0); // no duplicate while unread
+  });
+
+  it("raises a low-inventory alert (instead of reorder) when stock is at or below safety stock", () => {
+    const db = openDatabase(":memory:");
+    const inv = createInventoryItem(db, { sku: "S", name: "Nearly gone", unitCost: 5, qtyPurchased: 30, qtyReceived: 30 });
+    recordSale(db, { inventoryId: inv, date: "2026-09-20", qty: 27, salePrice: 20, fees: 0 });
+    runDealFinder(db, new Date("2026-09-24T12:00:00Z"));
+    const types = listAlerts(db).map((a) => a.type);
+    expect(types).toEqual(["low_inventory"]);
+  });
+
+  it("alerts on supplier price changes of 5% or more, once", () => {
+    const db = openDatabase(":memory:");
+    createSupplier(db, { name: "Up Co", lastPrice: 10, currentPrice: 11 });
+    createSupplier(db, { name: "Flat Co", lastPrice: 10, currentPrice: 10.2 });
+    const r = runDealFinder(db, new Date("2026-09-24T12:00:00Z"));
+    expect(r.alertsCreated).toBe(1);
+    const [a] = listAlerts(db);
+    expect(a.type).toBe("supplier_price_change");
+    expect(a.title).toBe("Up Co: price up 10.0%");
+    expect(runDealFinder(db, new Date("2026-09-24T13:00:00Z")).alertsCreated).toBe(0);
   });
 });
