@@ -60,7 +60,7 @@ await page.click("text=Run Deal Finder now");
 await page.waitForLoadState("networkidle");
 
 // 5. Every page, desktop and phone
-const routes = ["/", "/products", "/analyze", "/scan", "/calculator", "/deals", "/match", "/inventory", "/purchase-orders", "/purchase-orders/new", "/suppliers", "/cash-flow", "/sales-intelligence", "/price-monitor", "/alerts", "/dashboard", "/research-log", "/workflows", "/business-plan", "/glossary", "/settings", new URL(productUrl).pathname, `${new URL(productUrl).pathname}/report`];
+const routes = ["/", "/products", "/analyze", "/scan", "/calculator", "/deals", "/match", "/inventory", "/purchase-orders", "/purchase-orders/new", "/suppliers", "/cash-flow", "/sales-intelligence", "/price-monitor", "/alerts", "/dashboard", "/research-log", "/workflows", "/business-plan", "/glossary", "/settings", "/capital", "/listing-research", "/listing-writer", "/keywords", "/reviews", "/login", new URL(productUrl).pathname, `${new URL(productUrl).pathname}/report`];
 for (const width of [1280, 390]) {
   await page.setViewportSize({ width, height: 900 });
   for (const r of routes) {

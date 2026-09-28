@@ -9,9 +9,10 @@ A research and record-keeping assistant for a legitimate Amazon reselling busine
 | Area | Pages |
 | --- | --- |
 | Research | Analyze Product (ASIN, UPC, URL, or name), Find Products, Find Deals (filters with pass/fail reasons), Scan Spreadsheet (CSV/XLSX/Google Sheet in, analyzed file out), Calculate Profit, Product Matching |
+| Listing tools | Listing Research, Listing Writer (original copy, flags unsupported claims), Keyword Research, Review Analysis (all from text you provide) |
 | Operations | Inventory, Purchase Orders (receive into inventory), Suppliers (tradeoff comparison), Cash Flow & Expenses (plus a tax-prep CSV) |
 | Intelligence | Dashboard, Sales Intelligence, Price Monitor, Deal Alerts (Daily Deal Finder), Research Log |
-| Business | Workflows (daily/weekly/monthly checklists), Business Plan generator, Glossary, Settings |
+| Business | Capital Planner, Workflows (daily/weekly/monthly checklists), Business Plan generator, Glossary, Settings (including beginner/advanced explanations) |
 
 Every analysis includes: profit, ROI, margin, break-even price, maximum buy price, minimum profitable price, FBA vs FBM, low/expected/high scenarios, a sensitivity table, sales-velocity ranges, competition, price history, a risk table, a data-confidence level, missing information, a verification checklist, a suggested test quantity, and scaling considerations.
 
@@ -61,9 +62,46 @@ The demo data is **fictional**: every record is named "SAMPLE". A sample buy lis
 | `npm run deal-finder` | Runs the Daily Deal Finder once (creates timestamped alerts) |
 | `npm run deal-finder -- --schedule "0 8 * * *"` | Keeps running and fires on a cron schedule |
 | `npm run seed:demo` | Loads fictional demo data into an empty database |
+| `docker build -t amazon-reselling-ai .` | Production image (see Deploy) |
 | `node e2e/smoke.mjs` | Browser smoke test against a running server (see the file header) |
 
 To run the Deal Finder daily without keeping a process open, add a system cron job, e.g. `0 8 * * * cd /path/to/app && npm run deal-finder`.
+
+## Deploy (put it online)
+
+The app is a Node.js server with a SQLite database file. It needs a host with a **persistent disk**; otherwise your data is lost on every deploy. That rules out Vercel and other serverless hosts.
+
+**Always set `APP_PASSWORD`** for an online deployment. Without it, anyone with the URL can see and change your business data. When it's set, every page asks for the password (Sign out is in the sidebar). `robots.txt` also asks search engines not to index the site.
+
+### Render (easiest)
+
+1. Push this repo to GitHub (it's already there).
+2. In [Render](https://render.com), choose **New → Blueprint** and select the repo. Render reads `render.yaml`.
+3. Enter an `APP_PASSWORD` when asked. `CRON_SECRET` is generated for you.
+4. Deploy. Render builds the `Dockerfile` and mounts a 1 GB disk at `/data` for the database.
+
+Persistent disks need a paid Render instance (Starter). Check Render's current pricing.
+
+### Any server with Docker (VPS, Railway, Fly.io, …)
+
+```bash
+docker build -t amazon-reselling-ai .
+docker run -d -p 3000:3000 -v reseller-data:/data \
+  -e APP_PASSWORD='choose-a-long-password' -e CRON_SECRET='another-random-string' \
+  --name reseller amazon-reselling-ai
+```
+
+If Docker Hub rate-limits the base image, build with `--build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:22-bookworm-slim`.
+
+Put it behind HTTPS (e.g. Caddy, or your host's TLS). Back up the `reseller-data` volume (it contains `reseller.db`) regularly.
+
+### Running the Deal Finder on a schedule when hosted
+
+Set `CRON_SECRET`, then have any scheduler (a Render Cron Job, cron-job.org, GitHub Actions) call:
+
+```bash
+curl -X POST https://your-app.example.com/api/deal-finder -H "Authorization: Bearer $CRON_SECRET"
+```
 
 ## Optional data connections
 

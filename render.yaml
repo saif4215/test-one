@@ -1,0 +1,20 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Render → New → Blueprint → pick this repo. You'll be asked for APP_PASSWORD.
+# A persistent disk (needed so your SQLite data survives deploys) requires a paid instance type.
+services:
+  - type: web
+    name: amazon-reselling-ai
+    runtime: docker
+    plan: starter
+    healthCheckPath: /login
+    envVars:
+      - key: APP_PASSWORD
+        sync: false
+      - key: CRON_SECRET
+        generateValue: true
+      - key: DATABASE_PATH
+        value: /data/reseller.db
+    disk:
+      name: reseller-data
+      mountPath: /data
+      sizeGB: 1
