@@ -14,8 +14,9 @@ window.CAFE = {
   // Three short selling points under the hero. Keep only what is true.
   facts: [["Baked daily", "Every morning"], ["Order ahead", "Skip the line"], ["Vegan & gluten-free", "Clearly labeled"]],
 
-  address: "123 Example Street, Staten Island, NY 10301",
-  mapQuery: "123 Example Street, Staten Island, NY 10301",
+  // Address taken from a single online directory listing (atly.com) - confirm it on Google Maps, add the ZIP, then keep.
+  address: "365 Veterans Rd W, Staten Island, NY",
+  mapQuery: "Maruf Cafe, 365 Veterans Rd W, Staten Island, NY",
   phone: "(718) 555-0123",
   email: "hello@example.com",
   timezone: "America/New_York",
