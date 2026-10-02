@@ -18,7 +18,7 @@ window.CAFE = {
   taxRate: 0.08875,
   deliveryFee: 3.0,
   freeDeliveryOver: 30,
-  social: { instagram: "", facebook: "" },
+  social: { instagram: "https://www.instagram.com/maruf.cafe/", facebook: "" },
   // PHOTOS: put image URLs or files (e.g. "img/hero.jpg") here. Empty = styled illustration fallback.
   // Menu items can also take an `img: "img/latte.jpg"` field. Only use photos you own or are licensed to use
   // (your own shots, or free-licence sites such as Unsplash/Pexels with their terms followed).

@@ -39,6 +39,10 @@
   if (C.heroImage) {
     const h = $("#hero-bg"); h.style.backgroundImage = `url("${C.heroImage}")`; h.classList.add("has-img");
   }
+  if (C.social.instagram) {
+    $("#insta").hidden = false; $("#insta-link").href = C.social.instagram;
+    $("#foot-contact").insertAdjacentHTML("afterend", `<a href="${esc(C.social.instagram)}" target="_blank" rel="noopener">Instagram</a>`);
+  }
   if (C.externalOrderUrl) {
     const o = $("#order-cta"); o.href = C.externalOrderUrl; o.target = "_blank"; o.rel = "noopener";
   }
