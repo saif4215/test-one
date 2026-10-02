@@ -27,7 +27,7 @@
   };
 
   /* ---------- static content ---------- */
-  document.title = `${C.name} — Coffee, Breakfast & Bakery`;
+  document.title = C.name;
   $("#hero-title").textContent = C.tagline;
   $("#year").textContent = new Date().getFullYear();
   $("#address").textContent = C.address;
