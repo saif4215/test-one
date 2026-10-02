@@ -137,6 +137,7 @@ form .btn+.btn{margin-top:10px}
 .hero-art{position:absolute;right:max(20px,calc((100% - 1120px)/2 + 20px));top:50%;transform:translateY(-50%);width:min(380px,34vw);opacity:.95;pointer-events:none}
 @media(max-width:900px){.hero-art{display:none}}
 
-.insta{display:flex;gap:24px;align-items:center;margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);max-width:560px}
+.socials{margin-top:28px}.insta{display:flex;gap:24px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);max-width:560px;flex:1 1 420px}
 .insta img{border-radius:10px;flex:none;border:1px solid var(--border)}.insta h3{margin:0 0 4px}.insta p{margin:0 0 12px;color:var(--muted)}
 @media(max-width:480px){.insta{flex-direction:column;text-align:center}}
+.socials{display:flex;gap:20px;flex-wrap:wrap}.socials[hidden]{display:none}

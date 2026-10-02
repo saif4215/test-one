@@ -39,10 +39,12 @@
   if (C.heroImage) {
     const h = $("#hero-bg"); h.style.backgroundImage = `url("${C.heroImage}")`; h.classList.add("has-img");
   }
-  if (C.social.instagram) {
-    $("#insta").hidden = false; $("#insta-link").href = C.social.instagram;
-    $("#foot-contact").insertAdjacentHTML("afterend", `<a href="${esc(C.social.instagram)}" target="_blank" rel="noopener">Instagram</a>`);
-  }
+  const socials = [["instagram", "insta", "Instagram"], ["tiktok", "tiktok", "TikTok"]].filter(([k]) => C.social[k]);
+  socials.forEach(([k, id, label]) => {
+    $("#" + id).hidden = false; $("#" + id + "-link").href = C.social[k];
+    $("#foot-contact").insertAdjacentHTML("afterend", `<a href="${esc(C.social[k])}" target="_blank" rel="noopener">${label}</a>`);
+  });
+  $("#socials").hidden = !socials.length;
   if (C.externalOrderUrl) {
     const o = $("#order-cta"); o.href = C.externalOrderUrl; o.target = "_blank"; o.rel = "noopener";
   }
