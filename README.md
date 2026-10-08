@@ -32,6 +32,10 @@ Every analysis includes: profit, ROI, margin, break-even price, maximum buy pric
 
 **Amazon fees** come from a built-in **reference table** (`src/data/feeTables.us.ts`, dated 2025-01-15) and are always labeled *Estimate*. Check them against Seller Central. You can override referral rates and storage rates in Settings, or enter Amazon's exact fees for a product (for example, from the Revenue Calculator). Fees you enter, and fees from the SP-API, always take priority over the table.
 
+## Maruf Cafe purchase agreements (e-signature)
+
+A separate module under `/agreements` for preparing, reviewing, e-signing, and tracking a **Business Purchase and Sale Agreement** for Maruf Cafe: multi-step builder, generated contract and schedules, PDF, secure signing links with email verification, DocuSign integration, Resend email, audit trail, admin area, and per-agreement permissions. It has its own accounts (`npm run agreements:admin -- you@example.com "Your Name"`). The DocuSign and Resend integrations are written but **not yet tested against live accounts**; follow the sandbox checklist first. See **[docs/AGREEMENTS.md](docs/AGREEMENTS.md)** for setup, provider configuration, testing, deployment, backup, and security notes. It is a template generator, not legal advice.
+
 ## Getting started
 
 Requires Node.js 22+.

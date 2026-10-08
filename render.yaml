@@ -14,6 +14,33 @@ services:
         generateValue: true
       - key: DATABASE_PATH
         value: /data/reseller.db
+      # --- purchase agreements (docs/AGREEMENTS.md) ---
+      - key: UPLOAD_DIR
+        value: /data/files
+      - key: APP_URL
+        sync: false          # e.g. https://your-service.onrender.com
+      - key: APP_SECRET
+        generateValue: true
+      - key: FILE_ENCRYPTION_KEY
+        generateValue: true  # must be a base64 32-byte value; copy it somewhere safe, files can't be read without it
+      - key: DOCUSIGN_ENV
+        value: demo
+      - key: DOCUSIGN_INTEGRATION_KEY
+        sync: false
+      - key: DOCUSIGN_USER_ID
+        sync: false
+      - key: DOCUSIGN_ACCOUNT_ID
+        sync: false
+      - key: DOCUSIGN_PRIVATE_KEY
+        sync: false
+      - key: DOCUSIGN_CONNECT_HMAC_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: RESEND_WEBHOOK_SECRET
+        sync: false
     disk:
       name: reseller-data
       mountPath: /data

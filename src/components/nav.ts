@@ -51,6 +51,12 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
+    label: "Maruf Cafe Deal",
+    items: [
+      { href: "/agreements", label: "Purchase Agreements", description: "Prepare, review, e-sign, and track the Maruf Cafe business purchase agreement. Has its own sign-in." },
+    ],
+  },
+  {
     label: "Business",
     items: [
       { href: "/capital", label: "Capital Planner", description: "Split your budget between inventory, shipping, operating costs, and a reserve." },
