@@ -7,7 +7,7 @@
  * clause text it was created from, so editing the master template never changes
  * an existing (or signed) agreement.
  *
- * This is customizable template language for attorney review, not legal advice.
+ * This is customizable template language, not legal advice.
  */
 
 export interface ClauseDef {
@@ -83,7 +83,7 @@ export const CLAUSES: ClauseDef[] = [
     key: "s2.other",
     section: 2,
     title: "Other transaction",
-    text: "The Parties intend the following transaction, the structure and wording of which will be reviewed and settled by the Parties' attorneys: {{transactionOtherOrPlaceholder}}",
+    text: "The Parties intend the following transaction, the structure and wording of which the Parties will settle in writing: {{transactionOtherOrPlaceholder}}",
   },
   {
     key: "s2.unselected",
@@ -184,8 +184,8 @@ export const CLAUSES: ClauseDef[] = [
   {
     key: "s9.intro",
     section: 9,
-    title: "Seller representations (for attorney review)",
-    text: "The following provisions are proposed for attorney review. They are statements Seller is asked to make and are not established facts. Their accuracy must be verified before signing, and Seller may qualify them in the disclosure schedules.",
+    title: "Seller representations",
+    text: "The following provisions are proposed for the Parties' review. They are statements Seller is asked to make and are not established facts. Their accuracy must be verified before signing, and Seller may qualify them in the disclosure schedules.",
   },
   {
     key: "s9.authority",
@@ -335,7 +335,7 @@ export const CLAUSES: ClauseDef[] = [
     key: "s16.law",
     section: 16,
     title: "Governing law and venue",
-    text: "This Agreement is governed by the laws of the {{governingLaw}}, without regard to conflict-of-laws rules. Courts and venue: {{venue}}. This is a proposal for attorney review; no guarantee is made that any provision is enforceable in every circumstance.",
+    text: "This Agreement is governed by the laws of the {{governingLaw}}, without regard to conflict-of-laws rules. Courts and venue: {{venue}}. This is a proposed term; no guarantee is made that any provision is enforceable in every circumstance.",
   },
   {
     key: "s16.mediation",
@@ -389,7 +389,7 @@ export const CLAUSES: ClauseDef[] = [
     key: "s17.esign",
     section: 17,
     title: "Electronic signatures",
-    text: "The Parties agree to sign this Agreement electronically and agree that electronic signatures and records are intended to have the same effect as handwritten signatures and paper records to the extent permitted by the federal Electronic Signatures in Global and National Commerce Act and the New York Electronic Signatures and Records Act. Some documents (for example, a deed or a notarized document) may require a different execution method; those requirements are reserved for the Parties' attorneys.",
+    text: "The Parties agree to sign this Agreement electronically and agree that electronic signatures and records are intended to have the same effect as handwritten signatures and paper records to the extent permitted by the federal Electronic Signatures in Global and National Commerce Act and the New York Electronic Signatures and Records Act. Some documents (for example, a deed or a notarized document) may require a different execution method; those requirements are for the Parties to check.",
   },
   {
     key: "s17.schedules",
@@ -413,7 +413,7 @@ export const CLAUSES: ClauseDef[] = [
     key: "s18.notary",
     section: 18,
     title: "Notarial acknowledgment (optional)",
-    text: "State of New York, County of ____________. A notarial acknowledgment, if the Parties' attorneys require one, must be completed by a duly commissioned notary public in accordance with New York law. This application does not perform, simulate, or record any notarization.",
+    text: "State of New York, County of ____________. A notarial acknowledgment, if the Parties want one, must be completed by a duly commissioned notary public in accordance with New York law. This application does not perform, simulate, or record any notarization.",
   },
 ];
 

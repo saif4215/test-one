@@ -48,7 +48,7 @@ export default async function EditStep({ params }: PageProps<"/agreements/[id]/e
   return (
     <>
       <PageHeader
-        title={isClauses ? "Legal wording (attorney review)" : `Step ${stepMeta.n}: ${stepMeta.label}`}
+        title={isClauses ? "Legal wording" : `Step ${stepMeta.n}: ${stepMeta.label}`}
         subtitle={<span className="flex flex-wrap items-center gap-2"><span className="font-mono">{b.agreement.id}</span><span>· version {b.version.versionNo}</span><StatusPill status={b.agreement.status} /></span>}
         actions={<Link href={`/agreements/${id}`} className="btn btn-secondary btn-sm">Details</Link>}
       />
@@ -100,7 +100,7 @@ export default async function EditStep({ params }: PageProps<"/agreements/[id]/e
           {step === "submit" && <SubmitStep id={id} issueCount={issues.length} issues={issues.filter((i) => i.step !== "submit").map((i) => `${STEPS.find((s) => s.key === i.step)?.label}: ${i.message}`)} flags={attorneyFlags(b.data)} locked={locked} status={b.agreement.status} />}
           {step === "terms" && (
             <p className="mb-4 text-sm text-muted">
-              Attorneys can customize the exact legal wording of every section in <Link href={`/agreements/${id}/edit/clauses`} className="underline">Legal wording</Link>.
+              You can customize the exact legal wording of every section in <Link href={`/agreements/${id}/edit/clauses`} className="underline">Legal wording</Link>.
             </p>
           )}
           <StepForm
@@ -157,8 +157,8 @@ function DocumentsStep({ id, locked, refIds }: { id: string; locked: boolean; re
 function SubmitStep({ id, issueCount, issues, flags, locked, status }: { id: string; issueCount: number; issues: string[]; flags: string[]; locked: boolean; status: string }) {
   return (
     <div className="mb-6 space-y-5">
-      <Card title="Attorney review flags">
-        <p className="mb-2 text-sm text-muted">Points to raise with your New York attorney. These are prompts, not legal conclusions.</p>
+      <Card title="Points worth double-checking">
+        <p className="mb-2 text-sm text-muted">Things people often miss in a deal like this. These are prompts, not legal conclusions.</p>
         <ul className="list-disc space-y-1 pl-5 text-sm">{flags.map((f) => <li key={f}>{f}</li>)}</ul>
       </Card>
       <Card title="Ready to submit?">

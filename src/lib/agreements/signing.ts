@@ -84,7 +84,7 @@ async function sendInvitation(deps: Deps, sig: SignerRow, kind: "invitation" | "
       `This link is personal to you and expires on ${request.expiresAt.slice(0, 10)}. You will confirm your email with a one-time code before you can see the agreement. Do not forward this email.`,
     ],
     cta: { label: "Review and sign", url: `${deps.baseUrl}/sign/${token}` },
-    footnote: "This agreement is a template-based document and is not legal advice. Consider asking a New York attorney to review it before you sign.",
+    footnote: "This agreement is a template-based document and is not legal advice. Read it carefully before you sign; you may ask an attorney to review it if you wish.",
     dedupeKey: `${kind}:${sig.id}:${sha256Hex(token).slice(0, 16)}`,
   });
   return res.status === "failed" ? { ok: false, error: res.error } : { ok: true };

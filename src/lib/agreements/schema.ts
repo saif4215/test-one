@@ -57,7 +57,7 @@ export const TRANSACTION_LABEL: Record<TransactionType | "", string> = {
   asset_purchase: "Asset purchase",
   equity_purchase: "Purchase of ownership or equity interests in a business entity",
   operations_goodwill: "Business operations and goodwill purchase",
-  other: "Other transaction (to be reviewed by the parties' attorneys)",
+  other: "Other transaction (described by the parties)",
 };
 
 export const businessSchema = z.object({
@@ -253,7 +253,7 @@ export const agreementDataSchema = z.object({
   employment: employmentSchema.default(() => employmentSchema.parse({})),
   terms: termsSchema.default(() => termsSchema.parse({})),
   checkpoints: checkpointsSchema.default(() => checkpointsSchema.parse({})),
-  /** Per-agreement wording changes made by an attorney or authorized editor, keyed by clause key. */
+  /** Per-agreement wording changes made by an authorized editor, keyed by clause key. */
   clauseOverrides: z.record(z.string(), z.string().max(20000)).default({}),
   /** Extra "Schedule G" conditions, free text. */
   additionalConditions: str,

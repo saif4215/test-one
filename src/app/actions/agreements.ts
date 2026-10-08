@@ -161,7 +161,7 @@ export async function upgradeTemplateAction(_prev: ActionState, fd: FormData): P
 export async function sendAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const user = await requireUser();
   const id = str(fd, "agreementId");
-  if (str(fd, "confirm") !== "on") return fail("Please confirm that the parties and the attorney have approved this version.");
+  if (str(fd, "confirm") !== "on") return fail("Please confirm that the parties have approved this version.");
   const res = await sendForSignature(defaultDeps(), actorFor(user), id, { order: str(fd, "order") as SigningOrder, expiryDays: Number(str(fd, "expiryDays")) });
   if (!res.ok) return fail(res.error);
   revalidatePath(`/agreements/${id}`, "layout");

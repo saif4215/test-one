@@ -62,7 +62,7 @@ export default async function PreviewPage({ params, searchParams }: PageProps<"/
           </Notice>
         )}
         <details className="rounded-md border border-border bg-surface p-3 text-sm">
-          <summary className="cursor-pointer font-medium">Points to raise with your attorney</summary>
+          <summary className="cursor-pointer font-medium">Points worth double-checking</summary>
           <ul className="mt-2 list-disc space-y-1 pl-5">{attorneyFlags(versionData(version)).map((f) => <li key={f}>{f}</li>)}</ul>
         </details>
       </div>

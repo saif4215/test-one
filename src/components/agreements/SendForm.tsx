@@ -30,7 +30,7 @@ export function SendForm({ agreementId, defaultDays, disabled, buyerName, seller
       </label>
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" name="confirm" className="mt-1 h-4 w-4" required disabled={disabled} />
-        <span>I confirm this exact version has been reviewed by the parties and their attorney and is ready to be signed. Sending locks it; any later change requires a new version that everyone must sign again.</span>
+        <span>I confirm this exact version has been reviewed by the parties and is ready to be signed. Sending locks it; any later change requires a new version that everyone must sign again.</span>
       </label>
       {state.message && !state.ok && <div role="alert" className="rounded-md bg-bad-bg px-3 py-2 text-sm text-bad">{state.message}</div>}
       <SubmitButton pendingLabel="Sending…" disabled={disabled}>Send for signature</SubmitButton>

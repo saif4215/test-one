@@ -112,6 +112,19 @@ describe("creating and editing agreements", () => {
     expect(again.agreement.status).toBe("draft");
   });
 
+  it("attorney review is optional: an agreement without it is still ready, but seller authority and ownership checks still are required", () => {
+    const actor = actorOf(w.admin);
+    const noAttorney = newCompleteAgreement(w, (d) => {
+      d.checkpoints.attorneyReviewed = false;
+      d.checkpoints.attorneyName = "";
+    });
+    expect(readiness(w.db, loadAgreement(w.db, actor, noAttorney)!)).toEqual([]);
+    const noAuthority = newCompleteAgreement(w, (d) => {
+      d.checkpoints.sellerAuthorityVerified = false;
+    });
+    expect(readiness(w.db, loadAgreement(w.db, actor, noAuthority)!).map((i) => i.message)).toEqual([expect.stringMatching(/seller's authority/i)]);
+  });
+
   it("a complete agreement passes the readiness check", () => {
     const b = loadAgreement(w.db, actorOf(w.admin), newCompleteAgreement(w))!;
     expect(readiness(w.db, b)).toEqual([]);

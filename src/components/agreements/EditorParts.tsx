@@ -91,7 +91,7 @@ export function SubmitReviewForm({ agreementId, blocked }: { agreementId: string
       <input type="hidden" name="agreementId" value={agreementId} />
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" name="confirm" className="mt-1 h-4 w-4" required disabled={blocked} />
-        <span>I have reviewed the full agreement preview and the details above are correct. I understand an attorney should review it before anyone signs.</span>
+        <span>I have reviewed the full agreement preview and the details above are correct. I understand it is a template and not legal advice.</span>
       </label>
       {state.message && !state.ok && (
         <div role="alert" className="rounded-md bg-bad-bg px-3 py-2 text-sm text-bad">

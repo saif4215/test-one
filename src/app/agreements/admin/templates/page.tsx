@@ -15,7 +15,7 @@ export default async function TemplatesPage() {
     <>
       <PageHeader title="Agreement templates" subtitle={`Editing creates template version ${latest.versionNo + 1}. Every agreement version keeps the exact wording it was created with, so signed agreements are never silently changed.`} />
       <div className="space-y-5">
-        <Notice tone="warn">Template wording is attorney-reviewed language. Have a New York attorney approve changes before using them.</Notice>
+        <Notice tone="warn">Template wording is the starting text for every new agreement. Edit it carefully. Existing agreements keep the wording they were created with.</Notice>
         <Card title="Template history">
           <ul className="space-y-1 text-sm">
             {all.map((t) => <li key={t.id}>v{t.versionNo} · {fmtStamp(t.createdAt)} · {t.note || "—"}</li>)}

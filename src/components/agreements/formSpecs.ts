@@ -241,7 +241,7 @@ export const STEP_SPECS: Record<string, SectionSpec[]> = {
     },
     {
       title: "Closing conditions (Section 13, Schedule G)",
-      description: "A checklist attorneys and authorized users can edit.",
+      description: "A checklist that authorized users can edit.",
       fields: [
         {
           type: "list", path: "conditions", label: "Conditions", itemTitle: "Condition", addLabel: "Add a condition", max: 60, blank: { label: "", required: true, responsible: "", status: "open", notes: "" },
@@ -258,14 +258,14 @@ export const STEP_SPECS: Record<string, SectionSpec[]> = {
     },
     {
       title: "Default, confidentiality, and disputes (Sections 14–16, 18)",
-      description: "Proposed terms for attorney review. No penalties or forfeitures are added unless you write them.",
+      description: "Proposed terms. No penalties or forfeitures are added unless you write them.",
       fields: [
         { type: "field", kind: "checkbox", path: "terms.cureAgreed", label: "The parties agree to an opportunity to cure a default" },
         { type: "field", kind: "text", path: "terms.cureDays", label: "Cure period (days)", placeholder: "e.g. 10" },
         { type: "field", kind: "textarea", path: "terms.terminationNotes", label: "Other agreed termination conditions", rows: 2, span: 2 },
         { type: "field", kind: "checkbox", path: "terms.confidentiality", label: "Include the optional confidentiality clause (Section 15)" },
         { type: "field", kind: "text", path: "terms.governingLaw", label: "Governing law (proposed: State of New York)", required: true },
-        { type: "field", kind: "textarea", path: "terms.venue", label: "Court jurisdiction and venue", rows: 2, span: 2, required: true, hint: "Have your attorney confirm. No guarantee is made that any clause is enforceable." },
+        { type: "field", kind: "textarea", path: "terms.venue", label: "Court jurisdiction and venue", rows: 2, span: 2, required: true, hint: "Check this is right for you. No guarantee is made that any clause is enforceable." },
         { type: "field", kind: "checkbox", path: "terms.mediation", label: "Include optional mediation" },
         { type: "field", kind: "checkbox", path: "terms.arbitration", label: "Include optional arbitration" },
         { type: "field", kind: "textarea", path: "terms.arbitrationNotes", label: "Arbitration terms (forum, rules, seat)", rows: 2, span: 2 },
@@ -276,17 +276,17 @@ export const STEP_SPECS: Record<string, SectionSpec[]> = {
   ],
   submit: [
     {
-      title: "Verification and attorney review",
-      description: "These confirmations are made by people, not by the application. Sending is blocked until all are confirmed.",
+      title: "Verification",
+      description: "These confirmations are made by people, not by the application. The first two are required before sending. Attorney review is optional.",
       fields: [
         { type: "field", kind: "checkbox", path: "checkpoints.sellerAuthorityVerified", label: "The seller's authority to sell (and the signer's authority to sign) has been verified from documents" },
         { type: "field", kind: "textarea", path: "checkpoints.sellerAuthorityNotes", label: "How it was verified", rows: 2, span: 2 },
         { type: "field", kind: "checkbox", path: "checkpoints.ownershipVerified", label: "Ownership of the business, assets, or interests being sold has been verified" },
         { type: "field", kind: "textarea", path: "checkpoints.ownershipNotes", label: "How it was verified", rows: 2, span: 2 },
         { type: "field", kind: "checkbox", path: "checkpoints.leaseReviewed", label: "The lease (or ownership of the premises) and any landlord consent requirements have been reviewed" },
-        { type: "field", kind: "checkbox", path: "checkpoints.attorneyReviewed", label: "A qualified New York attorney has reviewed this agreement" },
-        { type: "field", kind: "text", path: "checkpoints.attorneyName", label: "Attorney's name" },
-        { type: "field", kind: "textarea", path: "checkpoints.attorneyNotes", label: "Attorney notes", rows: 2, span: 2 },
+        { type: "field", kind: "checkbox", path: "checkpoints.attorneyReviewed", label: "An attorney has reviewed this agreement (optional)" },
+        { type: "field", kind: "text", path: "checkpoints.attorneyName", label: "Attorney's name (optional)" },
+        { type: "field", kind: "textarea", path: "checkpoints.attorneyNotes", label: "Notes (optional)", rows: 2, span: 2 },
       ],
     },
   ],

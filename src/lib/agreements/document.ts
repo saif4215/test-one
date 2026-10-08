@@ -274,7 +274,7 @@ export function buildDocument(input: BuildInput): BuiltDocument {
 
   /* ---- 9 ---- */
   h(9);
-  blocks.push({ t: "banner", tone: "warn", text: "Provisions for attorney review. These are proposed representations, not established facts, and must be verified before signing." });
+  blocks.push({ t: "banner", tone: "warn", text: "Proposed representations. These are statements the Seller is asked to make, not established facts, and should be verified before signing." });
   blocks.push({ t: "p", num: "9.1", text: text("s9.intro") });
   ["s9.authority", "s9.ownership", "s9.liens", "s9.liabilities", "s9.disputes", "s9.accuracy", "s9.restrictions"].forEach((k, i) =>
     blocks.push({ t: "p", num: `9.${i + 2}`, text: `${CLAUSES.find((c) => c.key === k)?.title ?? ""}. ${text(k)}` }),

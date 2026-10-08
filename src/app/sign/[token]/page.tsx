@@ -93,7 +93,7 @@ export default async function SignPage({ params, searchParams }: PageProps<"/sig
         <div className="mb-4"><Notice tone="warn" title="Not confirmed yet.">We haven&apos;t received confirmation from the e-signature service that you signed. If you finished signing, wait a minute and reload this page. If you left without finishing, you can start again below.</Notice></div>
       )}
       <div className="mb-4 space-y-2">
-        <Notice tone="info" title="Please read the whole agreement below.">This is the exact document you will sign (fingerprint <span className="font-mono">{request.sentDocumentHash.slice(0, 16)}…</span>). <a className="underline" href={`${base}?kind=sent`}>Download it as a PDF</a>. We recommend having a New York attorney review it first.</Notice>
+        <Notice tone="info" title="Please read the whole agreement below.">This is the exact document you will sign (fingerprint <span className="font-mono">{request.sentDocumentHash.slice(0, 16)}…</span>). <a className="underline" href={`${base}?kind=sent`}>Download it as a PDF</a>. Read it carefully; you may ask an attorney to look at it first if you wish.</Notice>
       </div>
       <div className="max-h-[70vh] overflow-y-auto rounded-lg" tabIndex={0} aria-label="Agreement text, scrollable">
         <ContractView doc={doc} />

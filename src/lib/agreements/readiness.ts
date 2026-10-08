@@ -97,13 +97,12 @@ export function readinessIssues(
   if (!d.conditions.length) add("terms", "Add at least one closing condition.");
   if (d.terms.cureAgreed && !d.terms.cureDays) add("terms", "Enter the number of cure days or turn off the cure period.");
   if (!d.terms.governingLaw) add("terms", "Enter the governing law.");
-  if (!d.terms.venue) add("terms", "Enter the court jurisdiction and venue (for attorney confirmation).");
+  if (!d.terms.venue) add("terms", "Enter the court jurisdiction and venue.");
   if (d.terms.arbitration && !d.terms.arbitrationNotes) add("terms", "Describe the arbitration terms or turn arbitration off.");
 
   const c = d.checkpoints;
   if (!c.sellerAuthorityVerified) add("submit", "Confirm that the Seller's authority to sell has been verified.");
   if (!c.ownershipVerified) add("submit", "Confirm that ownership of the Business, assets, or interests has been verified.");
-  if (!c.attorneyReviewed || !c.attorneyName) add("submit", "Record that a qualified attorney reviewed the agreement, and enter their name.");
 
   // Anything still showing a placeholder in the finished document.
   const doc = buildDocument({
@@ -119,12 +118,12 @@ export function readinessIssues(
   return out;
 }
 
-/** Items the parties' attorneys should look at. These are flags, not legal conclusions. */
+/** Points worth double-checking (with an attorney or accountant, if you use one). Prompts, not legal conclusions. */
 export function attorneyFlags(d: AgreementData): string[] {
   const f: string[] = [];
   const t = d.business.transactionType;
   if (t === "asset_purchase" || t === "operations_goodwill" || t === "other") {
-    f.push("Sale of business assets in New York: the bulk-sale notification rules of the New York Department of Taxation and Finance may apply to the purchaser. Ask your attorney or accountant whether notice is required and when.");
+    f.push("Sale of business assets in New York: the bulk-sale notification rules of the New York Department of Taxation and Finance may apply to the purchaser. Check with whoever advises you (for example an attorney or accountant) whether notice is required and when.");
   }
   if (t === "equity_purchase") f.push("Purchase of equity interests: check the entity's governing documents for consent, transfer, and approval requirements, and the effect on its existing liabilities.");
   if (d.lease.tenure !== "owned") f.push("Commercial lease: assignment usually needs the landlord's written consent. Do not assume the Buyer can occupy until that consent or a new lease is in hand.");
@@ -132,8 +131,8 @@ export function attorneyFlags(d: AgreementData): string[] {
   const alcohol = d.permits.find((p) => /alcohol/i.test(p.name));
   if (alcohol && alcohol.applicable !== "no") f.push("Alcohol licensing: licenses are typically issued by the regulator to a named licensee and may not be transferable. Confirm the approval process before closing.");
   f.push("Food-service permits and health approvals are generally issued to a specific operator; confirm with the NYC Department of Health and Mental Hygiene whether Buyer needs its own permit.");
-  if (d.terms.includeNotary || d.terms.includeWitness) f.push("Witness or notarial acknowledgment is selected: these must be completed in person or by a method your attorney confirms is valid. This application does not notarize.");
-  f.push("Electronic signatures: federal ESIGN and the New York Electronic Signatures and Records Act generally support electronic signing of commercial contracts, but some documents are excluded or have special requirements. Your attorney should confirm this transaction qualifies.");
-  if (d.liabilities.items.some((l) => l.category === "taxes" || l.category === "wages")) f.push("Tax and wage liabilities can follow the business or its successor regardless of what the parties agree. Ask your attorney or accountant how to protect Buyer.");
+  if (d.terms.includeNotary || d.terms.includeWitness) f.push("Witness or notarial acknowledgment is selected: these must be completed in person or by a method that is valid for your situation. This application does not notarize.");
+  f.push("Electronic signatures: federal ESIGN and the New York Electronic Signatures and Records Act generally support electronic signing of commercial contracts, but some documents are excluded or have special requirements. Confirm this transaction qualifies.");
+  if (d.liabilities.items.some((l) => l.category === "taxes" || l.category === "wages")) f.push("Tax and wage liabilities can follow the business or its successor regardless of what the parties agree. Check with whoever advises you how to protect Buyer.");
   return f;
 }
