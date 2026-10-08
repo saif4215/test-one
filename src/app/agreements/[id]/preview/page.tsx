@@ -2,13 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ContractView } from "@/components/agreements/ContractView";
 import { LegalNotice, StatusPill } from "@/components/agreements/parts";
+import { SubmitReviewForm } from "@/components/agreements/EditorParts";
+import { QuickNav } from "@/components/agreements/QuickNav";
 import { StepNav } from "@/components/agreements/StepNav";
 import { Notice, PageHeader } from "@/components/ui";
 import { attorneyFlags } from "@/lib/agreements/readiness";
 import { documentForVersion, listVersions, loadAgreement, readiness, versionData } from "@/lib/agreements/repo";
 import { actorFor, requireUser } from "@/lib/agreements/session";
 import { currentSigners } from "@/lib/agreements/signing";
-import type { StepKey } from "@/lib/agreements/steps";
+import type { IssueStep } from "@/lib/agreements/steps";
 import { getDb } from "@/lib/db/client";
 
 export default async function PreviewPage({ params, searchParams }: PageProps<"/agreements/[id]/preview">) {
@@ -24,7 +26,7 @@ export default async function PreviewPage({ params, searchParams }: PageProps<"/
   const isCurrent = version.id === b.version.id;
   const doc = documentForVersion(db, b.agreement, version, { draft: true });
   const issues = isCurrent ? readiness(db, b) : [];
-  const counts: Partial<Record<StepKey, number>> = {};
+  const counts: Partial<Record<IssueStep, number>> = {};
   for (const i of issues) counts[i.step] = (counts[i.step] ?? 0) + 1;
   const { request } = currentSigners(db, id);
   const signedReady = !!request && request.status === "completed" && !!request.signedAttachmentId;
@@ -45,7 +47,7 @@ export default async function PreviewPage({ params, searchParams }: PageProps<"/
           </>
         }
       />
-      <StepNav agreementId={id} current="preview" issueCounts={counts} />
+      {b.data.mode === "quick" ? <QuickNav agreementId={id} current="check" issueCount={issues.length} /> : <StepNav agreementId={id} current="preview" issueCounts={counts} />}
       {versions.length > 1 && (
         <nav aria-label="Versions" className="mb-4 flex flex-wrap items-center gap-2 text-sm">
           <span className="text-muted">Version:</span>
@@ -67,10 +69,24 @@ export default async function PreviewPage({ params, searchParams }: PageProps<"/
         </details>
       </div>
       <ContractView doc={doc} />
-      <div className="no-print mt-6 flex flex-wrap gap-2">
-        <Link href={`/agreements/${id}/edit/terms`} className="btn btn-secondary">← Edit</Link>
-        <Link href={`/agreements/${id}/edit/submit`} className="btn">Continue to Step 9: Confirm and submit →</Link>
-      </div>
+      {b.data.mode === "quick" ? (
+        <div className="no-print mt-6 space-y-3 rounded-lg border border-border bg-surface p-4">
+          <Link href={`/agreements/${id}/edit`} className="btn btn-secondary">← Change something</Link>
+          {isCurrent && b.agreement.status === "draft" && b.caps.edit && !b.version.signaturesRequested && (
+            <>
+              <h2 className="text-base font-semibold">Happy with it?</h2>
+              <SubmitReviewForm agreementId={id} blocked={issues.length > 0} />
+              {issues.length > 0 && <p className="text-sm text-bad">Fix these first: {issues.slice(0, 3).map((i) => i.message).join(" ")}{issues.length > 3 ? ` (and ${issues.length - 3} more)` : ""}</p>}
+            </>
+          )}
+          {isCurrent && b.agreement.status === "awaiting_review" && <Link href={`/agreements/${id}/send`} className="btn ml-2">Continue to send →</Link>}
+        </div>
+      ) : (
+        <div className="no-print mt-6 flex flex-wrap gap-2">
+          <Link href={`/agreements/${id}/edit/terms`} className="btn btn-secondary">← Edit</Link>
+          <Link href={`/agreements/${id}/edit/submit`} className="btn">Continue to Step 9: Confirm and submit →</Link>
+        </div>
+      )}
       <div className="mt-6"><LegalNotice /></div>
     </>
   );

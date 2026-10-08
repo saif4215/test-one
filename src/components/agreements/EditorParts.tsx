@@ -6,7 +6,7 @@ import { ActionForm, SubmitButton, type ActionState } from "./ActionForm";
 
 const init: ActionState = {};
 
-export function UploadPanel({ agreementId, disabled }: { agreementId: string; disabled?: boolean }) {
+export function UploadPanel({ agreementId, disabled, hideSchedule }: { agreementId: string; disabled?: boolean; hideSchedule?: boolean }) {
   const [state, action] = useActionState(uploadAttachmentAction, init);
   return (
     <form action={action} className="space-y-3 rounded-lg border border-border bg-surface p-4">
@@ -24,7 +24,7 @@ export function UploadPanel({ agreementId, disabled }: { agreementId: string; di
             <option value="photo">Photograph</option>
           </select>
         </label>
-        <label className="block text-sm" htmlFor="up-schedule">
+        {hideSchedule ? <input type="hidden" name="schedule" value="" /> : <label className="block text-sm" htmlFor="up-schedule">
           <span className="mb-1 block font-medium">Belongs to schedule</span>
           <select id="up-schedule" name="schedule" className="input" disabled={disabled}>
             <option value="">None (general attachment)</option>
@@ -32,7 +32,7 @@ export function UploadPanel({ agreementId, disabled }: { agreementId: string; di
               <option key={s} value={s}>Schedule {s}</option>
             ))}
           </select>
-        </label>
+        </label>}
       </div>
       <p className="text-xs text-muted">PDFs and images are added to the agreement as numbered exhibits and appear in the final PDF. Other file types are listed in the attachment index with their fingerprint but are provided separately. Files are stored privately; they are never public URLs.</p>
       <div className="flex flex-wrap items-center gap-3">

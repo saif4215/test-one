@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LegalNotice, StatusPill } from "@/components/agreements/parts";
+import { QuickNav } from "@/components/agreements/QuickNav";
 import { SendForm } from "@/components/agreements/SendForm";
 import { Card, Notice, PageHeader } from "@/components/ui";
 import { integrationStatus } from "@/lib/agreements/config";
@@ -24,6 +25,7 @@ export default async function SendPage({ params }: PageProps<"/agreements/[id]/s
   return (
     <>
       <PageHeader title="Send for signature" subtitle={<span className="flex flex-wrap items-center gap-2"><span className="font-mono">{id}</span><span>· version {b.version.versionNo}</span><StatusPill status={b.agreement.status} /></span>} />
+      {b.data.mode === "quick" && <QuickNav agreementId={id} current="send" issueCount={issues.length} />}
       <div className="space-y-5">
         {!b.caps.send && <Notice tone="bad">You don&apos;t have permission to send this agreement.</Notice>}
         {b.agreement.status !== "awaiting_review" && (

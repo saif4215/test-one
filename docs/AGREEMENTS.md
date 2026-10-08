@@ -102,6 +102,11 @@ The app records an email as **"accepted by email service"** when Resend takes it
 
 ## 6. How signing works
 
+**Two ways to start an agreement** (`/agreements/new`):
+- **Quick agreement (recommended):** one page of about 15 questions, a short plain-English agreement (about 3 PDF pages), then Check → Send. Answers it doesn't ask for are filled with stated defaults (e.g. the payment schedule is the deposit plus the balance at closing; possession passes at closing). It still blocks sending until the required facts and the two "I checked" confirmations are present, never invents values, and uses the same secure signing, versioning, audit, and provider-verified completion as the full agreement. It doesn't use the editable template wording or schedules A–G. The "other transaction" type needs the full agreement.
+- **Full agreement:** the nine-step builder and 18-section contract described below.
+
+
 1. **Build** (Steps 1–7): buyer, seller, business, assets, price and payments, lease/liabilities/conditions, attachments. Save drafts any time.
 2. **Preview** (Step 8), **confirm and submit** (Step 9). Submitting needs every required item, the two human **checkpoints** (seller's authority verified, ownership verified), and no unfinished `[TO BE COMPLETED]` placeholders. Attorney review is recorded if you have one but is **optional** and never blocks sending.
 3. **Send** (`/agreements/{id}/send`): choose order (buyer first, seller first, or both) and link expiry. The app builds the final PDF (agreement + schedules + attachment index + PDF/image exhibits), hashes it, creates the DocuSign envelope, then locks the version. If DocuSign rejects it, nothing is locked and nothing is emailed.

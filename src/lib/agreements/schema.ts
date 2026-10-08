@@ -234,7 +234,16 @@ export const checkpointsSchema = z.object({
   attorneyNotes: str,
 });
 
+/** Extra answers used only by the quick (short-form) agreement. */
+export const quickSchema = z.object({
+  /** Debts the buyer takes on. Empty means none. */
+  buyerAssumes: str,
+});
+
 export const agreementDataSchema = z.object({
+  /** "quick" = short plain-English agreement from one page of questions; "full" = the complete 18-section builder. */
+  mode: z.enum(["full", "quick"]).default("full"),
+  quick: quickSchema.default(() => quickSchema.parse({})),
   buyer: partySchema.default(() => partySchema.parse({})),
   seller: partySchema.default(() => partySchema.parse({})),
   business: businessSchema.default(() => businessSchema.parse({})),

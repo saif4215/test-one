@@ -65,7 +65,7 @@ export function AgreementList({ db, actor, status, emptyHint }: { db: DB; actor:
               Last activity: {lastActivity ? `${ACTIVITY[lastActivity.type] ?? lastActivity.type.replace(/[._]/g, " ")} · ${fmtStamp(lastActivity.at)}` : "—"}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              {editable && <Link href={`/agreements/${a.id}/edit/buyer`} className="btn btn-sm">Continue editing</Link>}
+              {editable && <Link href={`/agreements/${a.id}/edit`} className="btn btn-sm">Continue editing</Link>}
               <Link href={`/agreements/${a.id}/preview`} className="btn btn-secondary btn-sm">Preview</Link>
               {c.send && a.status === "awaiting_review" && <Link href={`/agreements/${a.id}/send`} className="btn btn-secondary btn-sm">Send for signature</Link>}
               {signed && <a href={`/agreements/${a.id}/pdf?kind=signed`} className="btn btn-sm">Download signed agreement</a>}

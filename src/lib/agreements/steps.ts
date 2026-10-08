@@ -12,3 +12,6 @@ export const STEPS = [
 ] as const;
 export type StepKey = (typeof STEPS)[number]["key"];
 export const isStepKey = (v: string): v is StepKey => STEPS.some((s) => s.key === v);
+
+/** Where a readiness problem is fixed: a full-builder step, or the single quick-form page. */
+export type IssueStep = StepKey | "quick";

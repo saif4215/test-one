@@ -5,10 +5,11 @@
 import { buildDocument, findPlaceholders, type AttachmentInfo } from "./document";
 import { parseCents, sumCents } from "./money";
 import { LIABILITY_CATEGORIES, type AgreementData, type Party } from "./schema";
-import type { StepKey } from "./steps";
+import { quickIssues } from "./quick";
+import type { IssueStep, StepKey } from "./steps";
 
 export interface Issue {
-  step: StepKey;
+  step: IssueStep;
   message: string;
 }
 
@@ -31,6 +32,13 @@ export function readinessIssues(
   d: AgreementData,
   ctx: { snapshot: Record<string, string>; attachments: AttachmentInfo[]; agreementId?: string; versionNo?: number },
 ): Issue[] {
+  if (d.mode === "quick") {
+    const out = quickIssues(d, ctx);
+    const doc = buildDocument({ agreementId: ctx.agreementId ?? "preview", versionNo: ctx.versionNo ?? 1, data: d, snapshot: ctx.snapshot, attachments: ctx.attachments, draft: true });
+    const left = findPlaceholders(doc);
+    if (left.length) out.push({ step: "quick", message: `Still to fill in: ${left.slice(0, 6).join("; ")}${left.length > 6 ? "…" : ""}.` });
+    return out;
+  }
   const out: Issue[] = [];
   const add = (step: StepKey, message: string) => out.push({ step, message });
 

@@ -6,12 +6,13 @@ import { ClauseEditor, RemoveAttachment, SubmitReviewForm, UploadPanel } from "@
 import { STEP_SPECS } from "@/components/agreements/formSpecs";
 import { LegalNotice, StatusPill, fmtStamp } from "@/components/agreements/parts";
 import { StepForm } from "@/components/agreements/StepForm";
+import { QuickNav } from "@/components/agreements/QuickNav";
 import { StepNav } from "@/components/agreements/StepNav";
 import { Card, Notice, PageHeader } from "@/components/ui";
 import { attorneyFlags } from "@/lib/agreements/readiness";
 import { latestTemplate, listAttachments, loadAgreement, readiness } from "@/lib/agreements/repo";
 import { actorFor, requireUser } from "@/lib/agreements/session";
-import { STEPS, isStepKey, type StepKey } from "@/lib/agreements/steps";
+import { STEPS, isStepKey, type IssueStep, type StepKey } from "@/lib/agreements/steps";
 import { CLAUSES } from "@/lib/agreements/template";
 import { getDb } from "@/lib/db/client";
 
@@ -22,6 +23,7 @@ const SLICES: Record<string, string[]> = {
   assets: ["assets"],
   price: ["price", "closing", "business"],
   terms: ["lease", "closing", "liabilities", "conditions", "permits", "employment", "terms", "additionalConditions"],
+  quick: ["buyer", "seller", "business", "assets", "price", "lease", "closing", "quick", "checkpoints"],
   submit: ["checkpoints"],
 };
 
@@ -32,27 +34,32 @@ export default async function EditStep({ params }: PageProps<"/agreements/[id]/e
   const b = loadAgreement(db, actorFor(user), id);
   if (!b) notFound();
   if (step === "preview") redirect(`/agreements/${id}/preview`);
+  const quickMode = b.data.mode === "quick";
+  // A quick agreement has one form page (plus optional attachments); the full builder has nine steps.
+  if (quickMode && step !== "quick" && step !== "documents") redirect(`/agreements/${id}/edit/quick`);
+  if (!quickMode && step === "quick") redirect(`/agreements/${id}/edit/buyer`);
   const isClauses = step === "clauses";
-  if (!isClauses && !isStepKey(step)) notFound();
-  const key = (isClauses ? "terms" : step) as StepKey;
+  if (!isClauses && step !== "quick" && !isStepKey(step)) notFound();
+  const key = (isClauses || step === "quick" ? "terms" : step) as StepKey;
 
   const issues = readiness(db, b);
-  const counts: Partial<Record<StepKey, number>> = {};
+  const counts: Partial<Record<IssueStep, number>> = {};
   for (const i of issues) counts[i.step] = (counts[i.step] ?? 0) + 1;
   const stepIdx = STEPS.findIndex((s) => s.key === key);
   const stepMeta = STEPS[stepIdx];
+  const quickCount = issues.filter((i) => i.step === "quick").length;
   const locked = !b.caps.edit || b.version.signaturesRequested || b.agreement.status === "cancelled";
-  const stepIssues = issues.filter((i) => i.step === key);
+  const stepIssues = issues.filter((i) => (step === "quick" ? i.step === "quick" : i.step === key));
   const latest = latestTemplate(db);
 
   return (
     <>
       <PageHeader
-        title={isClauses ? "Legal wording" : `Step ${stepMeta.n}: ${stepMeta.label}`}
+        title={quickMode ? (step === "documents" ? "Attach files (optional)" : "Quick agreement: fill in the details") : isClauses ? "Legal wording" : `Step ${stepMeta.n}: ${stepMeta.label}`}
         subtitle={<span className="flex flex-wrap items-center gap-2"><span className="font-mono">{b.agreement.id}</span><span>· version {b.version.versionNo}</span><StatusPill status={b.agreement.status} /></span>}
         actions={<Link href={`/agreements/${id}`} className="btn btn-secondary btn-sm">Details</Link>}
       />
-      <StepNav agreementId={id} current={isClauses ? "clauses" : key} issueCounts={counts} />
+      {quickMode ? <QuickNav agreementId={id} current="details" issueCount={quickCount} /> : <StepNav agreementId={id} current={isClauses ? "clauses" : key} issueCounts={counts} />}
 
       {b.version.signaturesRequested && (
         <div className="mb-5 space-y-2 rounded-lg border border-border bg-surface p-4">
@@ -94,7 +101,7 @@ export default async function EditStep({ params }: PageProps<"/agreements/[id]/e
           )}
         </>
       ) : step === "documents" ? (
-        <DocumentsStep id={id} locked={locked} refIds={b.version.attachmentRefs.map((r) => r.id)} />
+        <DocumentsStep id={id} locked={locked} quick={quickMode} refIds={b.version.attachmentRefs.map((r) => r.id)} />
       ) : (
         <>
           {step === "submit" && <SubmitStep id={id} issueCount={issues.length} issues={issues.filter((i) => i.step !== "submit").map((i) => `${STEPS.find((s) => s.key === i.step)?.label}: ${i.message}`)} flags={attorneyFlags(b.data)} locked={locked} status={b.agreement.status} />}
@@ -108,9 +115,9 @@ export default async function EditStep({ params }: PageProps<"/agreements/[id]/e
             step={step}
             sections={STEP_SPECS[step]}
             initial={Object.fromEntries((SLICES[step] ?? []).map((k) => [k, (b.data as unknown as Record<string, unknown>)[k]]))}
-            prevHref={stepIdx > 0 ? `/agreements/${id}/edit/${STEPS[stepIdx - 1].key}` : undefined}
+            prevHref={step !== "quick" && stepIdx > 0 ? `/agreements/${id}/edit/${STEPS[stepIdx - 1].key}` : undefined}
             locked={locked}
-            finalLabel={step === "submit" ? "Save checkpoints" : step === "terms" ? "Save and continue to documents →" : undefined}
+            finalLabel={step === "quick" ? "Save and check the agreement →" : step === "submit" ? "Save checkpoints" : step === "terms" ? "Save and continue to documents →" : undefined}
           />
         </>
       )}
@@ -120,15 +127,15 @@ export default async function EditStep({ params }: PageProps<"/agreements/[id]/e
   );
 }
 
-function DocumentsStep({ id, locked, refIds }: { id: string; locked: boolean; refIds: string[] }) {
+function DocumentsStep({ id, locked, refIds, quick }: { id: string; locked: boolean; refIds: string[]; quick: boolean }) {
   const refs = new Set(refIds);
   const files = listAttachments(getDb(), id).filter((a) => refs.has(a.id));
   return (
     <div className="space-y-6">
-      <Card title="Schedules generated for you">
-        <p className="text-sm text-muted">Schedules A (included assets), B (excluded assets), C (inventory and equipment), D (assumed liabilities), E (lease and premises), F (payment schedule) and G (additional conditions) are generated automatically from your answers. Attach supporting evidence here, such as an inventory document, equipment photos, a lease, or proof of authority.</p>
+      <Card title={quick ? "Optional attachments" : "Schedules generated for you"}>
+        {quick ? <p className="text-sm text-muted">Attach anything that supports the deal, such as an inventory list, equipment photos, the lease, or proof of ownership. PDFs and images are added to the agreement as numbered exhibits. You can skip this.</p> : <p className="text-sm text-muted">Schedules A (included assets), B (excluded assets), C (inventory and equipment), D (assumed liabilities), E (lease and premises), F (payment schedule) and G (additional conditions) are generated automatically from your answers. Attach supporting evidence here, such as an inventory document, equipment photos, a lease, or proof of authority.</p>}
       </Card>
-      <UploadPanel agreementId={id} disabled={locked} />
+      <UploadPanel agreementId={id} disabled={locked} hideSchedule={quick} />
       <Card title={`Attached to this version (${files.length})`}>
         {files.length === 0 ? (
           <p className="text-sm text-muted">No files attached.</p>
@@ -147,7 +154,7 @@ function DocumentsStep({ id, locked, refIds }: { id: string; locked: boolean; re
         )}
       </Card>
       <div className="flex gap-2">
-        <Link className="btn btn-secondary" href={`/agreements/${id}/edit/terms`}>← Back</Link>
+        <Link className="btn btn-secondary" href={`/agreements/${id}/edit`}>← Back</Link>
         <Link className="btn" href={`/agreements/${id}/preview`}>Continue to preview →</Link>
       </div>
     </div>

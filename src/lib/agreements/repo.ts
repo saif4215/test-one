@@ -21,6 +21,7 @@ import { lastActivity, recordEvent } from "./audit";
 import { buildDocument, type AttachmentInfo, type BuiltDocument } from "./document";
 import { parseCents } from "./money";
 import { capabilities, type AccessLevel, type Actor, type Capabilities } from "./permissions";
+import { applyQuickDefaults } from "./quick";
 import { readinessIssues, type Issue } from "./readiness";
 import {
   agreementDataSchema,
@@ -156,10 +157,11 @@ export function listParticipants(db: DB, agreementId: string) {
 
 /* ---------------- create / read ---------------- */
 
-export function createAgreement(db: DB, actor: Actor, now = new Date()): Result<{ agreement: AgreementRow; version: VersionRow }> {
+export function createAgreement(db: DB, actor: Actor, opts: { mode?: "full" | "quick" } = {}, now = new Date()): Result<{ agreement: AgreementRow; version: VersionRow }> {
   if (actor.role === "seller") return fail("Sellers can't create agreements.");
   const tpl = ensureTemplate(db, now);
   const data = defaultAgreementData();
+  data.mode = opts.mode === "quick" ? "quick" : "full";
   const id = newAgreementId(now);
   const versionId = newId();
   const t = now.toISOString();
@@ -255,6 +257,17 @@ const stepSlices = {
   }),
   submit: z.object({ checkpoints: checkpointsSchema }),
   clauses: z.object({ clauseOverrides: agreementDataSchema.shape.clauseOverrides }),
+  quick: z.object({
+    buyer: agreementDataSchema.shape.buyer,
+    seller: agreementDataSchema.shape.seller,
+    business: agreementDataSchema.shape.business,
+    assets: agreementDataSchema.shape.assets,
+    price: agreementDataSchema.shape.price,
+    lease: agreementDataSchema.shape.lease,
+    closing: agreementDataSchema.shape.closing,
+    quick: agreementDataSchema.shape.quick,
+    checkpoints: agreementDataSchema.shape.checkpoints,
+  }),
 } as const;
 export type EditableStep = keyof typeof stepSlices;
 export const isEditableStep = (s: string): s is EditableStep => s in stepSlices;
@@ -298,9 +311,11 @@ export function saveStep(db: DB, actor: Actor, agreementId: string, step: Editab
   const { agreement, version, data } = e.value;
   const slice = stepSlices[step].safeParse(rawSlice);
   if (!slice.success) return fail("Please fix the highlighted fields.", zodErrors(slice.error));
-  const merged = agreementDataSchema.safeParse({ ...data, ...slice.data });
+  // Only overwrite the parts the caller actually sent; zod fills missing keys with blanks, which must not wipe saved data.
+  const sent = Object.fromEntries(Object.entries(slice.data).filter(([k]) => rawSlice !== null && typeof rawSlice === "object" && k in (rawSlice as object)));
+  const merged = agreementDataSchema.safeParse({ ...data, ...sent });
   if (!merged.success) return fail("Please fix the highlighted fields.", zodErrors(merged.error));
-  const next = merged.data;
+  const next = merged.data.mode === "quick" ? applyQuickDefaults(merged.data) : merged.data;
   db.transaction((tx) => {
     tx.update(agreementVersions).set({ data: next, contentHash: contentHash(next, version.templateSnapshot, version.attachmentRefs) }).where(eq(agreementVersions.id, version.id)).run();
     touch(tx as unknown as DB, agreementId, now, { ...summaryColumns(next), ...(agreement.status === "awaiting_review" ? { status: "draft" } : {}) });

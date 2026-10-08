@@ -58,6 +58,88 @@ const party = (p: "buyer" | "seller", who: string): SectionSpec[] => [
 ];
 
 export const STEP_SPECS: Record<string, SectionSpec[]> = {
+  quick: [
+    {
+      title: "1. Who is buying and selling",
+      description: "Use full legal names. The signing link is emailed to each person, so use two different email addresses.",
+      fields: [
+        { type: "field", kind: "text", path: "buyer.legalName", label: "Buyer's full name", required: true },
+        { type: "field", kind: "email", path: "buyer.email", label: "Buyer's email", required: true },
+        { type: "field", kind: "textarea", path: "buyer.address", label: "Buyer's address", required: true, rows: 2, span: 2 },
+        { type: "field", kind: "tel", path: "buyer.phone", label: "Buyer's phone" },
+        { type: "field", kind: "text", path: "buyer.entityName", label: "Buyer's company (only if buying through one)" },
+        { type: "field", kind: "text", path: "seller.legalName", label: "Seller's full name", required: true },
+        { type: "field", kind: "email", path: "seller.email", label: "Seller's email", required: true },
+        { type: "field", kind: "textarea", path: "seller.address", label: "Seller's address", required: true, rows: 2, span: 2 },
+        { type: "field", kind: "tel", path: "seller.phone", label: "Seller's phone" },
+        { type: "field", kind: "text", path: "seller.entityName", label: "Seller's company (only if selling through one)" },
+        { type: "field", kind: "textarea", path: "seller.authorityBasis", label: "If the seller is a company: what shows they can sign for it?", rows: 2, span: 2, hint: "For example, the operating agreement or a company resolution. Leave blank if the seller is a person selling for themselves." },
+        { type: "field", kind: "textarea", path: "buyer.authorityBasis", label: "If the buyer is a company: what shows they can sign for it?", rows: 2, span: 2 },
+      ],
+    },
+    {
+      title: "2. What is being sold",
+      description: "Nothing is assumed. Name the owner of the cafe and list what the buyer is getting.",
+      fields: [
+        { type: "field", kind: "text", path: "business.streetAddress", label: "Street address of Maruf Cafe", required: true, span: 2 },
+        { type: "field", kind: "text", path: "business.owningEntity", label: "Who legally owns Maruf Cafe today?", required: true, hint: "A person or a company name. Check this; don't assume it's whoever runs the cafe." },
+        { type: "field", kind: "select", path: "business.transactionType", label: "What is the buyer buying?", required: true, options: [["", "Choose…"], ["asset_purchase", "Only the items listed below (equipment, stock, etc.)"], ["operations_goodwill", "The cafe's business and goodwill, plus the items below"], ["equity_purchase", "The company that owns the cafe (all or part of it)"]], span: 2 },
+        { type: "field", kind: "text", path: "business.sellerInterest", label: "How much of the company is being sold?", placeholder: "e.g. 100%", hint: "Only if the buyer is buying the company." },
+        {
+          type: "list", path: "assets.schedule", label: "Items being sold", itemTitle: "Item", addLabel: "Add an item", max: 300,
+          blank: { name: "", description: "", quantity: "", condition: "", serial: "", agreedValue: "", status: "included" },
+          columns: [
+            { key: "name", label: "Item", kind: "text", span: 2 },
+            { key: "quantity", label: "Quantity", kind: "text" },
+            { key: "agreedValue", label: "Value (optional)", kind: "money" },
+            { key: "description", label: "Details (optional)", kind: "text", span: 4 },
+          ],
+          emptyText: "No items yet. Add equipment, furniture, supplies, and anything else being sold.",
+        },
+        {
+          type: "list", path: "assets.excluded", label: "Not included (optional)", itemTitle: "Not included", addLabel: "Add something that is NOT being sold", max: 100, blank: { description: "", notes: "" },
+          columns: [{ key: "description", label: "What stays with the seller", kind: "text", span: 4 }],
+        },
+      ],
+    },
+    {
+      title: "3. Price and payment",
+      fields: [
+        { type: "field", kind: "money", path: "price.totalPrice", label: "Total price", required: true },
+        { type: "field", kind: "money", path: "price.deposit", label: "Deposit", required: true, hint: "Enter 0.00 if there is no deposit. The rest is paid at closing." },
+        { type: "field", kind: "text", path: "price.paymentMethod", label: "How will the buyer pay?", required: true, placeholder: "e.g. bank wire, certified check" },
+        { type: "field", kind: "date", path: "price.depositDue", label: "Deposit due date", hint: "Leave blank to use the agreement date." },
+        { type: "priceSummary" },
+        { type: "field", kind: "textarea", path: "price.depositTerms", label: "If the sale doesn't go through, what happens to the deposit?", required: true, rows: 2, span: 2 },
+      ],
+    },
+    {
+      title: "4. Dates and place",
+      fields: [
+        { type: "field", kind: "date", path: "business.effectiveDate", label: "Date of the agreement", required: true },
+        { type: "field", kind: "date", path: "closing.closingDate", label: "Closing date", required: true },
+        { type: "field", kind: "text", path: "closing.location", label: "Where or how will you close?", required: true, placeholder: "e.g. signed electronically, keys handed over at the cafe", span: 2 },
+      ],
+    },
+    {
+      title: "5. The premises and debts",
+      description: "The agreement does not promise the buyer can use the premises unless the landlord or owner agrees in writing.",
+      fields: [
+        { type: "field", kind: "select", path: "lease.tenure", label: "Is the cafe's building owned or leased?", required: true, options: [["", "Choose…"], ["leased", "Leased"], ["owned", "Owned"]] },
+        { type: "field", kind: "text", path: "lease.landlordName", label: "Landlord's or owner's name" },
+        { type: "field", kind: "select", path: "lease.landlordConsent", label: "Must the landlord approve the transfer?", options: [["", "Choose…"], ["required", "Yes"], ["not_required", "No"], ["unknown", "Not sure yet"]] },
+        { type: "field", kind: "textarea", path: "quick.buyerAssumes", label: "Debts the buyer takes on (leave blank for none)", rows: 3, span: 2, hint: "The seller stays responsible for every other debt, tax, and claim from before closing." },
+      ],
+    },
+    {
+      title: "6. Quick checks (required)",
+      description: "The app can't check these for you. Tick them only once you have.",
+      fields: [
+        { type: "field", kind: "checkbox", path: "checkpoints.sellerAuthorityVerified", label: "I have checked that the seller has the right to sell (and to sign), for example from ID or company papers" },
+        { type: "field", kind: "checkbox", path: "checkpoints.ownershipVerified", label: "I have checked who owns the cafe (for example the lease, registration, or ownership papers)" },
+      ],
+    },
+  ],
   buyer: party("buyer", "Buyer"),
   seller: [
     ...party("seller", "Seller"),

@@ -198,3 +198,21 @@ export function newCompleteAgreement(w: World, mutate?: (d: AgreementData) => vo
   grantAccess(w.db, actor, id, w.seller.email, "viewer", "seller");
   return id;
 }
+
+/** A complete quick (short-form) agreement, fictional data. */
+export function newQuickAgreement(w: World, mutate?: (d: AgreementData) => void) {
+  const actor = actorOf(w.admin);
+  const created = createAgreement(w.db, actor, { mode: "quick" });
+  if (!created.ok) throw new Error(created.error);
+  const id = created.value.agreement.id;
+  const d = completeData();
+  d.buyer.entityName = "";
+  d.buyer.signingCapacity = "";
+  d.seller.signingCapacity = "";
+  mutate?.(d);
+  const r = saveStep(w.db, actor, id, "quick", { buyer: d.buyer, seller: d.seller, business: d.business, assets: d.assets, price: d.price, lease: d.lease, closing: d.closing, quick: { buyerAssumes: "" }, checkpoints: d.checkpoints });
+  if (!r.ok) throw new Error(`${r.error} ${JSON.stringify(r.fields)}`);
+  grantAccess(w.db, actor, id, w.buyer.email, "viewer", "buyer");
+  grantAccess(w.db, actor, id, w.seller.email, "viewer", "seller");
+  return id;
+}

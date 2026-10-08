@@ -93,11 +93,11 @@ export default async function AgreementDetails({ params, searchParams }: PagePro
     <>
       <PageHeader
         title={b.agreement.id}
-        subtitle={<span className="flex flex-wrap items-center gap-2"><StatusPill status={b.agreement.status} /><span>version {b.version.versionNo}</span><span>· created {fmtDate(b.agreement.createdAt)}</span></span>}
+        subtitle={<span className="flex flex-wrap items-center gap-2"><StatusPill status={b.agreement.status} /><span>version {b.version.versionNo}{b.data.mode === "quick" ? " · quick agreement" : ""}</span><span>· created {fmtDate(b.agreement.createdAt)}</span></span>}
         actions={
           <>
             <Link className="btn btn-secondary btn-sm" href={`/agreements/${id}/preview`}>Preview</Link>
-            {b.caps.edit && ["draft", "awaiting_review"].includes(b.agreement.status) && <Link className="btn btn-secondary btn-sm" href={`/agreements/${id}/edit/buyer`}>Edit</Link>}
+            {b.caps.edit && ["draft", "awaiting_review"].includes(b.agreement.status) && <Link className="btn btn-secondary btn-sm" href={`/agreements/${id}/edit`}>Edit</Link>}
             {staff && b.agreement.status === "awaiting_review" && <Link className="btn btn-sm" href={`/agreements/${id}/send`}>Send for signature</Link>}
             {signedDocs && <a className="btn btn-sm" href={`/agreements/${id}/pdf?kind=signed`}>Download Signed Agreement</a>}
             {signedDocs?.certificateAttachmentId && <a className="btn btn-secondary btn-sm" href={`/agreements/${id}/pdf?kind=certificate`}>Download Signing Certificate</a>}

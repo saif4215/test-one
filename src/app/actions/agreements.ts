@@ -76,11 +76,11 @@ export async function changePasswordAction(_prev: ActionState, fd: FormData): Pr
 
 /* ---------------- agreements ---------------- */
 
-export async function createAgreementAction() {
+export async function createAgreementAction(fd: FormData) {
   const user = await requireUser();
-  const res = createAgreement(defaultDeps().db, actorFor(user));
+  const res = createAgreement(defaultDeps().db, actorFor(user), { mode: str(fd, "mode") === "quick" ? "quick" : "full" });
   if (!res.ok) redirect("/agreements");
-  redirect(`/agreements/${res.value.agreement.id}/edit/buyer`);
+  redirect(`/agreements/${res.value.agreement.id}/edit`);
 }
 
 export async function saveStepAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
@@ -97,6 +97,7 @@ export async function saveStepAction(_prev: ActionState, fd: FormData): Promise<
   const res = saveStep(defaultDeps().db, actorFor(user), id, step as EditableStep, payload);
   if (!res.ok) return fail(res.error, res.fields);
   revalidatePath(`/agreements/${id}`, "layout");
+  if (str(fd, "intent") === "next" && step === "quick") redirect(`/agreements/${id}/preview`);
   if (str(fd, "intent") === "next") {
     const idx = STEPS.findIndex((s) => s.key === step);
     const next = STEPS[idx + 1];
@@ -197,7 +198,7 @@ export async function reviseAction(_prev: ActionState, fd: FormData): Promise<Ac
   const res = await createRevision(defaultDeps(), actorFor(user), id, str(fd, "summary"));
   if (!res.ok) return fail(res.error);
   revalidatePath(`/agreements/${id}`, "layout");
-  redirect(`/agreements/${id}/edit/buyer`);
+  redirect(`/agreements/${id}/edit`);
 }
 
 export async function refreshStatusAction(_prev: ActionState, fd: FormData): Promise<ActionState> {

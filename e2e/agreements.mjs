@@ -59,6 +59,13 @@ check(bogus?.status() === 200 && (await page.isVisible("text=This link can't be 
 const wh = await desk.request.post(`${base}/api/webhooks/signature`, { data: "{}", headers: { "content-type": "application/json" } });
 check([401, 429].includes(wh.status()), "signature webhook without a valid signature is rejected");
 
+// --- quick agreement ---
+await page.goto(`${base}/agreements/new`);
+await page.click("button:has-text('Start a quick agreement')");
+await page.waitForURL(/\/edit\/quick/, { waitUntil: "commit" });
+check(await page.isVisible("text=Quick agreement: fill in the details"), "a quick agreement opens its single form page");
+check(await page.isVisible("text=3. Send to sign"), "quick agreements show the 3-step flow");
+
 // --- phone ---
 const phone = await browser.newContext({ viewport: { width: 390, height: 800 }, isMobile: true });
 const mp = await signIn(phone);
