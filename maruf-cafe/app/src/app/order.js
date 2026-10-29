@@ -1,0 +1,86 @@
+import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Body, Button, Card, Disclosure, H1, Small } from "../components/ui";
+import { FormShell } from "../components/FormShell";
+import { Adder, ItemPhoto } from "../components/MenuBrowser";
+import { business } from "../config";   // only the Square Online address is used here
+import { money, priceText, useOrder } from "../lib/order";
+import { splitOrderable } from "../lib/order-util";
+import { useOrdering } from "../lib/ordering";
+import { useMemory } from "../lib/memory";
+import { colors } from "../theme";
+import { openLink } from "../lib/links";
+
+export default function MyOrder() {
+  const order = useOrder();
+  const memory = useMemory();
+  const ordering = useOrdering();   // true when the café's server can put an order into its Square
+  const { needsPrice } = splitOrderable(order.entries);
+  const canPlace = ordering === true && needsPrice.length === 0;
+  const sent = () => memory.rememberOrder(order.entries);   // so "Order again" can offer these items next time
+  return (
+    <FormShell>
+      <H1>My order</H1>
+      {order.count === 0 ? (
+        <View style={{ alignItems: "flex-start", gap: 14, paddingTop: 6 }}>
+          <View style={{ width: 84, height: 84, borderRadius: 42, backgroundColor: colors.goldSoft, alignItems: "center", justifyContent: "center" }}><Ionicons name="bag-handle-outline" size={38} color={colors.goldText} /></View>
+          <Text style={{ fontSize: 18, fontWeight: "800", color: colors.ink }}>Nothing here yet</Text>
+          <Body>Your order is empty. Add something from the menu.</Body>
+          <Button title="Browse the menu" variant="gold" onPress={() => router.replace("/menu")} />
+        </View>
+      ) : (
+        <>
+          <View style={{ gap: 12 }}>
+            {order.entries.map((l) => (
+              <Card key={l.id} style={{ padding: 12, flexDirection: "row", gap: 12, alignItems: "center" }}>
+                <ItemPhoto item={l} size={64} always box={{ borderRadius: 16 }} />
+                <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                  <Text numberOfLines={2} style={{ fontWeight: "800", fontSize: 16, lineHeight: 21, color: colors.ink }}>{l.name}</Text>
+                  <Small>{priceText(l)} each</Small>
+                  {order.details[l.id] ? <Text style={{ fontSize: 13, lineHeight: 18, color: colors.goldText, fontWeight: "600" }}>Request: {order.details[l.id]}</Text> : null}
+                </View>
+                <Adder item={l} />
+              </Card>
+            ))}
+          </View>
+          <Card style={{ padding: 18, gap: 10 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <Text style={{ fontSize: 15, color: colors.muted }}>{order.count} {order.count === 1 ? "item" : "items"}</Text>
+            </View>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" }}>
+              <Text style={{ fontSize: 18, fontWeight: "800", color: colors.ink }}>{order.exact ? "Subtotal" : "Subtotal (from)"}</Text>
+              <Text style={{ fontSize: 22, fontWeight: "800", color: colors.ink }}>{money(order.low)}</Text>
+            </View>
+            {!order.exact ? <Small>Some items have more than one size. Your final price depends on the sizes you choose.</Small> : null}
+            <Small>Menu prices before tax. For large orders, Maruf Cafe confirms your final quote with you.</Small>
+          </Card>
+          {ordering === true && needsPrice.length ? (
+            <Card style={{ padding: 16, gap: 6 }}>
+              <Text style={{ fontWeight: "800", fontSize: 15, color: colors.ink }}>Some items can't be sent from the app yet</Text>
+              <Small>{needsPrice.map((l) => l.name).join(", ")} {needsPrice.length === 1 ? "has" : "have"} more than one price, depending on the size. Remove {needsPrice.length === 1 ? "it" : "them"} to place your order here, or order at the counter, on Square Online, or send a quote request.</Small>
+            </Card>
+          ) : null}
+          <View style={{ gap: 12 }}>
+            {canPlace ? (
+              <>
+                <Button title="Place order for pickup" variant="gold" icon="bag-check-outline" onPress={() => router.push("/checkout")} />
+                <Small style={{ textAlign: "center" }}>You pay at the counter when you pick it up.</Small>
+                <Disclosure title="Other ways to order" hint="A quote for a big order, or our Square Online store">
+                  <Button title="Request a quote with these items" variant="outline" size="medium" onPress={() => { sent(); router.replace({ pathname: "/quote", params: { foodItems: order.summary } }); }} />
+                  <Button title="Order pickup on Square Online" variant="outline" size="medium" icon="open-outline" href={business.orderUrl} onPress={sent} />
+                </Disclosure>
+              </>
+            ) : (
+              <>
+                <Button title="Request a quote with these items" variant="gold" onPress={() => { sent(); router.replace({ pathname: "/quote", params: { foodItems: order.summary } }); }} />
+                <Button title="Order pickup on Square Online" variant="primary" icon="open-outline" href={business.orderUrl} onPress={sent} />
+              </>
+            )}
+            <Button title="Clear my order" variant="outline" size="medium" onPress={order.clear} />
+          </View>
+        </>
+      )}
+    </FormShell>
+  );
+}
