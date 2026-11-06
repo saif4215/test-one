@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Maruf Cafe",
+    "slug": "maruf-cafe",
+    "scheme": "marufcafe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0907"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.marufcafe.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.marufcafe.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0907",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "versionCode": 1
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png",
+      "name": "Maruf Cafe",
+      "shortName": "Maruf Cafe",
+      "themeColor": "#FBF8F2",
+      "backgroundColor": "#FBF8F2"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "baseUrl": "/app"
+    },
+    "description": "Large orders, catering and event rental at Maruf Cafe in Staten Island."
+  }
+}
